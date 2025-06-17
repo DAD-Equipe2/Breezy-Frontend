@@ -13,5 +13,5 @@ export const getUserPosts = async (userId) => {
 
 export const getFeed = async () => {
   const res = await axios.get(`${API_URL}/posts/feed`);
-  return res.data;
+  return res.data.data;
 };
