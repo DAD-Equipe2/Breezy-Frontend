@@ -14,21 +14,23 @@ import { modifyPost } from "../services/postService";
 import CommentSection from "./CommentSection";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
+const MAX_LEN = 280;
 
-const PostCard = ({ post, isOwn }) => {
+export default function PostCard({ post, isOwn }) {
   const { user: currentUser } = useContext(AuthContext);
 
   const [likesCount, setLikesCount] = useState(0);
   const [isLiked, setIsLiked] = useState(false);
-
   const [comments, setComments] = useState([]);
   const [showComments, setShowComments] = useState(false);
   const [newComment, setNewComment] = useState("");
   const [replyToId, setReplyToId] = useState(null);
 
-  const [isEditingPost, setIsEditingPost] = useState(false);
-  const [editContentPost, setEditContentPost] = useState(post.content);
-  const [contentPost, setContentPost] = useState(post.content);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editContent, setEditContent] = useState(post.content);
+  const [editTags, setEditTags] = useState(post.tags.join(", "));
+  const [editMediaFile, setEditMediaFile] = useState(null);
+  const [errorEdit, setErrorEdit] = useState("");
 
   useEffect(() => {
     if (!currentUser) return;
@@ -39,7 +41,7 @@ const PostCard = ({ post, isOwn }) => {
         setIsLiked(userIds.includes(currentUser._id));
         setLikesCount(res.data.length);
       } catch (err) {
-        console.error("Erreur getPostLikes :", err);
+        console.error(err);
       }
     })();
   }, [currentUser, post._id]);
@@ -57,7 +59,7 @@ const PostCard = ({ post, isOwn }) => {
         setLikesCount((c) => c + 1);
       }
     } catch (err) {
-      console.error("Erreur like/unlike :", err);
+      console.error(err);
     }
   };
 
@@ -68,7 +70,7 @@ const PostCard = ({ post, isOwn }) => {
         const res = await getComments(post._id);
         setComments(res.data);
       } catch (err) {
-        console.error("Erreur getComments :", err);
+        console.error(err);
       }
     }
   };
@@ -87,21 +89,47 @@ const PostCard = ({ post, isOwn }) => {
       setNewComment("");
       setReplyToId(null);
     } catch (err) {
-      console.error("Erreur add/reply commentaire :", err);
+      console.error(err);
     }
   };
 
   const handleEditSubmit = async (e) => {
-  e.preventDefault();
-  try {
-    const res = await modifyPost(post._id, { content: editContentPost });
-    setContentPost(res.data.content);
-    setIsEditingPost(false);
-  } catch (err) {
-    alert("Erreur lors de la modification du post");
-    console.error(err);
-  }
-};
+    e.preventDefault();
+    setErrorEdit("");
+    if (!editContent.trim()) {
+      setErrorEdit("Le contenu est requis");
+      return;
+    }
+    if (editContent.length > MAX_LEN) {
+      setErrorEdit(`Max ${MAX_LEN} caractères`);
+      return;
+    }
+    const form = new FormData();
+    form.append("content", editContent.trim());
+    form.append(
+      "tags",
+      JSON.stringify(
+        editTags
+          .split(",")
+          .map((t) => t.trim())
+          .filter((t) => t)
+      )
+    );
+    if (editMediaFile) {
+      form.append("media", editMediaFile);
+    }
+    try {
+      const updated = await modifyPost(post._id, form);
+      post.content = updated.content;
+      post.tags = updated.tags;
+      post.mediaURL = updated.mediaURL;
+      setIsEditing(false);
+      setEditMediaFile(null);
+    } catch (err) {
+      console.error(err);
+      setErrorEdit("Erreur lors de la mise à jour");
+    }
+  };
 
   return (
     <div className="bg-white shadow rounded p-4 mb-6">
@@ -123,34 +151,36 @@ const PostCard = ({ post, isOwn }) => {
         </div>
       </div>
 
-      {post.tags?.length > 0 && (
-        <div className="flex space-x-2 mb-3">
-          {post.tags.map((tag, i) => (
-            <span
-              key={i}
-              className="text-xs text-blue-500 bg-blue-100 px-2 py-1 rounded"
-            >
-              #{tag}
-            </span>
-          ))}
-        </div>
-      )}
-      {post.mediaURL && (
-        <img
-          src={post.mediaURL}
-          alt="Media"
-          className="max-h-64 w-full object-cover rounded mb-3"
-        />
-      )}
-
-        {isEditingPost ? (
-        <form onSubmit={handleEditSubmit} className="mb-3">
+      {isEditing ? (
+        <form onSubmit={handleEditSubmit} className="space-y-2 mb-3">
+          {errorEdit && (
+            <div className="text-red-500 text-sm">{errorEdit}</div>
+          )}
           <textarea
-            className="w-full border rounded p-2"
-            value={editContentPost}
-            onChange={e => setEditContentPost(e.target.value)}
+            className="w-full border px-2 py-1 rounded"
+            value={editContent}
+            onChange={(e) => setEditContent(e.target.value)}
+            rows={3}
+            maxLength={MAX_LEN}
+            placeholder="Modifier le contenu…"
           />
-          <div className="flex space-x-2 mt-2">
+          <div className="text-right text-xs text-gray-600">
+            {editContent.length}/{MAX_LEN}
+          </div>
+          <input
+            type="text"
+            className="w-full border px-2 py-1 rounded"
+            placeholder="Tags (séparés par des virgules)"
+            value={editTags}
+            onChange={(e) => setEditTags(e.target.value)}
+          />
+          <input
+            type="file"
+            accept="image/*,video/*"
+            onChange={(e) => setEditMediaFile(e.target.files[0])}
+            className="block"
+          />
+          <div className="flex space-x-2">
             <button
               type="submit"
               className="px-3 py-1 bg-green-500 text-white rounded"
@@ -161,8 +191,11 @@ const PostCard = ({ post, isOwn }) => {
               type="button"
               className="px-3 py-1 bg-gray-300 rounded"
               onClick={() => {
-                setIsEditingPost(false);
-                setEditContentPost(contentPost);
+                setIsEditing(false);
+                setEditContent(post.content);
+                setEditTags(post.tags.join(", "));
+                setEditMediaFile(null);
+                setErrorEdit("");
               }}
             >
               Annuler
@@ -170,7 +203,50 @@ const PostCard = ({ post, isOwn }) => {
           </div>
         </form>
       ) : (
-        <p className="mb-3 whitespace-pre-line break-words ">{contentPost}</p>
+        <>
+          <p className="mb-3 whitespace-pre-line break-words">
+            {post.content}
+          </p>
+
+          {post.tags?.length > 0 && (
+            <div className="flex space-x-2 mb-3">
+              {post.tags.map((tag, i) => (
+                <span
+                  key={i}
+                  className="text-xs text-blue-500 bg-blue-100 px-2 py-1 rounded"
+                >
+                  #{tag}
+                </span>
+              ))}
+            </div>
+          )}
+
+          {post.mediaURL &&
+            (() => {
+              const url = post.mediaURL.startsWith("http")
+                ? post.mediaURL
+                : `${API_URL}${post.mediaURL}`;
+              const ext = post.mediaURL.split(".").pop().toLowerCase();
+              const imageExt = ["png", "jpg", "jpeg", "gif"];
+              if (imageExt.includes(ext)) {
+                return (
+                  <img
+                    src={url}
+                    alt="Media"
+                    className="w-full max-h-96 object-contain rounded mb-3"
+                  />
+                );
+              } else {
+                return (
+                  <video
+                    src={url}
+                    controls
+                    className="w-full max-h-96 object-contain rounded mb-3"
+                  />
+                );
+              }
+            })()}
+        </>
       )}
 
       <div className="flex items-center space-x-4 mb-3">
@@ -216,9 +292,9 @@ const PostCard = ({ post, isOwn }) => {
           </svg>
           <span>{comments.length}</span>
         </button>
-        {isOwn && !isEditingPost && (
+        {isOwn && !isEditing && (
           <button
-            onClick={() => setIsEditingPost(true)}
+            onClick={() => setIsEditing(true)}
             className="px-2 py-1 bg-blue-500 text-white rounded ml-2"
           >
             Modifier
@@ -238,6 +314,4 @@ const PostCard = ({ post, isOwn }) => {
       )}
     </div>
   );
-};
-
-export default PostCard;
+}

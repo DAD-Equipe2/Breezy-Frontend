@@ -12,6 +12,7 @@ export default function FeedPage() {
   const [loading, setLoading] = useState(true);
   const [newPostContent, setNewPostContent] = useState("");
   const [tagsInput, setTagsInput] = useState("");
+  const [mediaFile, setMediaFile] = useState(null);
   const [error, setError] = useState("");
   const MAX_LEN = 280;
 
@@ -21,17 +22,16 @@ export default function FeedPage() {
 
   useEffect(() => {
     if (!currentUser) return;
-    const fetchFeed = async () => {
+    (async () => {
       try {
         const postsArray = await getFeed();
         setPosts(postsArray);
       } catch (err) {
-        console.error("Erreur getFeed :", err);
+        console.error(err);
       } finally {
         setLoading(false);
       }
-    };
-    fetchFeed();
+    })();
   }, [currentUser]);
 
   const handlePostSubmit = async (e) => {
@@ -46,18 +46,29 @@ export default function FeedPage() {
       setError(`Le contenu ne doit pas dépasser ${MAX_LEN} caractères`);
       return;
     }
+    if (mediaFile) {
+      const isImage = mediaFile.type.startsWith("image/");
+      const max = isImage ? 5 * 1024 * 1024 : 50 * 1024 * 1024;
+      if (mediaFile.size > max) {
+        setError(
+          `Le fichier dépasse la limite de ${isImage ? "5" : "50"} Mo`
+        );
+        return;
+      }
+    }
     try {
       const tagsArray = tagsInput
         .split(",")
         .map((t) => t.trim())
-        .filter((t) => t.length > 0);
-      await createPost({ content, tags: tagsArray });
+        .filter((t) => t);
+      await createPost({ content, tags: tagsArray, media: mediaFile });
       setNewPostContent("");
       setTagsInput("");
+      setMediaFile(null);
       const postsArray = await getFeed();
       setPosts(postsArray);
     } catch (err) {
-      console.error("Erreur createPost :", err);
+      console.error(err);
       setError(err.response?.data?.message || "Erreur lors de la création");
     }
   };
@@ -69,9 +80,10 @@ export default function FeedPage() {
       <Navbar />
       <div className="max-w-2xl mx-auto mt-8 p-4">
         <form onSubmit={handlePostSubmit} className="mb-6">
-          {error && <div className="text-red-500 text-sm mb-2">{error}</div>}
+          {error && (
+            <div className="text-red-500 text-sm mb-2">{error}</div>
+          )}
           <textarea
-            className="w-full border px-3 py-2 rounded mb-1"
             placeholder="Quoi de neuf ?"
             value={newPostContent}
             onChange={(e) => {
@@ -80,28 +92,32 @@ export default function FeedPage() {
             }}
             rows={3}
             maxLength={MAX_LEN}
+            className="w-full border px-3 py-2 rounded mb-2"
           />
-          <div className="flex justify-between items-center text-sm text-gray-600 mb-2">
-            <span>
-              {newPostContent.length}/{MAX_LEN}
-            </span>
-            <input
-              type="text"
-              placeholder="Tags (séparés par des virgules)"
-              className="border px-3 py-2 rounded flex-1 mx-4"
-              value={tagsInput}
-              onChange={(e) => setTagsInput(e.target.value)}
-            />
-            <button
-              type="submit"
-              disabled={!newPostContent.trim() || newPostContent.length > MAX_LEN}
-              className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:opacity-50"
-            >
-              Publier
-            </button>
-          </div>
+          <input
+            type="text"
+            placeholder="Tags (séparés par des virgules)"
+            value={tagsInput}
+            onChange={(e) => setTagsInput(e.target.value)}
+            className="w-full border px-3 py-2 rounded mb-2"
+          />
+          <input
+            type="file"
+            accept="image/*,video/*"
+            onChange={(e) => setMediaFile(e.target.files[0])}
+            className="mb-2"
+          />
+          <button
+            type="submit"
+            disabled={
+              !newPostContent.trim() ||
+              newPostContent.length > MAX_LEN
+            }
+            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:opacity-50"
+          >
+            Publier
+          </button>
         </form>
-
         {loading ? (
           <div>Chargement du feed…</div>
         ) : posts.length === 0 ? (
