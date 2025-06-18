@@ -15,3 +15,8 @@ export const getFeed = async () => {
   const res = await axios.get(`${API_URL}/posts/feed`);
   return res.data.data;
 };
+
+export const modifyPost = async (postId, postData) => {
+  const res = await axios.patch(`${API_URL}/posts/${postId}`, postData);
+  return res.data;
+}

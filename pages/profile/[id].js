@@ -120,7 +120,7 @@ export default function ProfilePage() {
 
         {user.bio && (
           <div className="mt-4 bg-gray-100 border-l-4 border-blue-500 p-4 rounded">
-            <p className="text-gray-800">{user.bio}</p>
+            <p className="text-gray-800 whitespace-pre-line break-words ">{user.bio}</p>
           </div>
         )}
 
@@ -177,7 +177,7 @@ export default function ProfilePage() {
         {posts.length === 0 ? (
           <p>Aucun post pour le moment.</p>
         ) : (
-          posts.map((post) => <PostCard key={post._id} post={post} />)
+          posts.map((post) => <PostCard key={post._id} post={post} isOwn= {isOwn} />)
         )}
       </div>
     </>

@@ -10,19 +10,25 @@ import {
   addComment,
   replyToComment,
 } from "../services/commentService";
+import { modifyPost } from "../services/postService";
 import CommentSection from "./CommentSection";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
-const PostCard = ({ post }) => {
+const PostCard = ({ post, isOwn }) => {
   const { user: currentUser } = useContext(AuthContext);
 
   const [likesCount, setLikesCount] = useState(0);
   const [isLiked, setIsLiked] = useState(false);
+
   const [comments, setComments] = useState([]);
   const [showComments, setShowComments] = useState(false);
   const [newComment, setNewComment] = useState("");
   const [replyToId, setReplyToId] = useState(null);
+
+  const [isEditingPost, setIsEditingPost] = useState(false);
+  const [editContentPost, setEditContentPost] = useState(post.content);
+  const [contentPost, setContentPost] = useState(post.content);
 
   useEffect(() => {
     if (!currentUser) return;
@@ -85,6 +91,18 @@ const PostCard = ({ post }) => {
     }
   };
 
+  const handleEditSubmit = async (e) => {
+  e.preventDefault();
+  try {
+    const res = await modifyPost(post._id, { content: editContentPost });
+    setContentPost(res.data.content);
+    setIsEditingPost(false);
+  } catch (err) {
+    alert("Erreur lors de la modification du post");
+    console.error(err);
+  }
+};
+
   return (
     <div className="bg-white shadow rounded p-4 mb-6">
       <div className="flex items-center space-x-3 mb-2">
@@ -105,7 +123,6 @@ const PostCard = ({ post }) => {
         </div>
       </div>
 
-      <p className="mb-3">{post.content}</p>
       {post.tags?.length > 0 && (
         <div className="flex space-x-2 mb-3">
           {post.tags.map((tag, i) => (
@@ -124,6 +141,36 @@ const PostCard = ({ post }) => {
           alt="Media"
           className="max-h-64 w-full object-cover rounded mb-3"
         />
+      )}
+
+        {isEditingPost ? (
+        <form onSubmit={handleEditSubmit} className="mb-3">
+          <textarea
+            className="w-full border rounded p-2"
+            value={editContentPost}
+            onChange={e => setEditContentPost(e.target.value)}
+          />
+          <div className="flex space-x-2 mt-2">
+            <button
+              type="submit"
+              className="px-3 py-1 bg-green-500 text-white rounded"
+            >
+              Sauvegarder
+            </button>
+            <button
+              type="button"
+              className="px-3 py-1 bg-gray-300 rounded"
+              onClick={() => {
+                setIsEditingPost(false);
+                setEditContentPost(contentPost);
+              }}
+            >
+              Annuler
+            </button>
+          </div>
+        </form>
+      ) : (
+        <p className="mb-3 whitespace-pre-line break-words ">{contentPost}</p>
       )}
 
       <div className="flex items-center space-x-4 mb-3">
@@ -169,6 +216,14 @@ const PostCard = ({ post }) => {
           </svg>
           <span>{comments.length}</span>
         </button>
+        {isOwn && !isEditingPost && (
+          <button
+            onClick={() => setIsEditingPost(true)}
+            className="px-2 py-1 bg-blue-500 text-white rounded ml-2"
+          >
+            Modifier
+          </button>
+        )}
       </div>
 
       {showComments && (
