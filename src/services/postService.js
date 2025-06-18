@@ -1,4 +1,3 @@
-// src/services/postService.js
 import axios from "axios";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
@@ -24,12 +23,8 @@ export const getFeed = async () => {
   return res.data.data;
 };
 
-export const modifyPost = async (postId, { content, tags, media }) => {
-  const form = new FormData();
-  if (content !== undefined) form.append("content", content);
-  if (tags !== undefined) form.append("tags", JSON.stringify(tags));
-  if (media) form.append("media", media);
-  const res = await axios.patch(`${API_URL}/posts/${postId}`, form, {
+export const modifyPost = async (postId, FormData) => {
+  const res = await axios.patch(`${API_URL}/posts/${postId}`, FormData, {
     headers: { "Content-Type": "multipart/form-data" },
   });
   return res.data.data;
