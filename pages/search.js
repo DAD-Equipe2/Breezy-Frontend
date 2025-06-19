@@ -44,7 +44,7 @@ export default function SearchPage() {
                   {userResults.map((user) => (
                     <li key={user._id} className="mb-2 flex items-center gap-2">
                       <a
-                        href={`/profile/${user.username}`}
+                        href={`/profile/${user._id}`}
                         className="text-blue-600 hover:underline font-semibold"
                       >
                         {user.username}
