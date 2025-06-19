@@ -11,3 +11,9 @@ export const updateProfile = async ({ bio, avatarURL }) => {
   const res = await axios.put(`${API_BASE}/users/profile`, { bio, avatarURL });
   return res.data.data;
 };
+
+export const searchUsers = async (query) => {
+  if (!query) return [];
+  const res = await axios.get(`${API_BASE}/users/search`, { params: { query } });
+  return res.data
+}

@@ -3,18 +3,23 @@ import { useEffect, useState } from "react";
 import Navbar from "../src/components/Navbar";
 import PostCard from "../src/components/PostCard";
 import { searchPosts } from "../src/services/postService";
+import { searchUsers } from "../src/services/userService";
 
 export default function SearchPage() {
   const router = useRouter();
   const { query } = router.query;
-  const [results, setResults] = useState([]);
+  const [postResults, setPostResults] = useState([]);
+  const [userResults, setUserResults] = useState([]);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (!query) return;
     setLoading(true);
-    searchPosts(query)
-      .then(setResults)
+    Promise.all([searchUsers(query), searchPosts(query)])
+      .then(([users, posts]) => {
+        setUserResults(users);
+        setPostResults(posts);
+      })
       .finally(() => setLoading(false));
   }, [query]);
 
@@ -27,10 +32,42 @@ export default function SearchPage() {
         </h2>
         {loading ? (
           <div>Recherche en cours…</div>
-        ) : results.length === 0 ? (
-          <p>Aucun résultat.</p>
         ) : (
-          results.map((post) => <PostCard key={post._id} post={post} />)
+          <>
+            {/* Affichage des profils */}
+            <div className="mb-6">
+              <h3 className="text-xl font-semibold mb-2">Profils</h3>
+              {userResults.length === 0 ? (
+                <p>Aucun profil trouvé.</p>
+              ) : (
+                <ul>
+                  {userResults.map((user) => (
+                    <li key={user._id} className="mb-2 flex items-center gap-2">
+                      <a
+                        href={`/profile/${user.username}`}
+                        className="text-blue-600 hover:underline font-semibold"
+                      >
+                        {user.username}
+                      </a>
+                      <span className="text-xs text-gray-500">
+                        {user.followersCount} followers · {user.followingCount} abonnements
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+
+            {/* Affichage des posts */}
+            <div>
+              <h3 className="text-xl font-semibold mb-2">Posts</h3>
+              {postResults.length === 0 ? (
+                <p>Aucun post trouvé.</p>
+              ) : (
+                postResults.map((post) => <PostCard key={post._id} post={post} />)
+              )}
+            </div>
+          </>
         )}
       </div>
     </>
