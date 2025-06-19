@@ -18,27 +18,32 @@ export default function Register() {
 
   const handleChange = (e) =>
     setFormData((f) => ({ ...f, [e.target.name]: e.target.value }));
+    const handleFile = (e) => {
+      const file = e.target.files[0];
+      if (file && file.size > 5 * 1024 * 1024) {
+        alert("5 Mo max");
+        return;
+      }
+      setAvatarFile(file);
+    };
 
-  const handleFile = (e) => {
-    const file = e.target.files[0];
-    if (file && file.size > 5 * 1024 * 1024) {
-      alert("5 Mo max");
-      return;
-    }
-    setAvatarFile(file);
-  };
+    const handleSubmit = async (e) => {
+      e.preventDefault();
+      setLoading(true);
+      setError(null);
+      try {
+        const data = new FormData();
+        data.append("username", formData.username);
+        data.append("email", formData.email);
+        data.append("password", formData.password);
+        data.append("bio", formData.bio);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setError(null);
-    try {
-      const data = new FormData();
-      data.append("username", formData.username);
-      data.append("email", formData.email);
-      data.append("password", formData.password);
-      data.append("bio", formData.bio);
-      if (avatarFile) data.append("avatar", avatarFile);
+        if (avatarFile) {
+          data.append("avatar", avatarFile);
+        } else {
+          // Ajoute une URL d'avatar par défaut si aucun fichier n'est choisi
+          data.append("avatarUrl", "/default-avatar.png");
+        }
 
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/auth/register`,

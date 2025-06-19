@@ -7,18 +7,19 @@ import SearchBar from "./SearchBar";
 const Navbar = () => {
   const { user, logout } = useContext(AuthContext);
   const pathname = usePathname();
-  const isOnFeed = pathname === "/feed";
+  const isOnFeed = pathname === "/feed" || pathname.startsWith("/profile");
 
   return (
     <nav className="fixed top-0 left-0 right-0 bg-transparent backdrop-blur-md p-4 flex items-center justify-between z-30">
       {/* Logo */}
-      <div className="flex-shrink-0">
-        <Link href="/" className="text-xl font-bold">
-          Breezy
+      <div className="flex-shrink-0 flex items-center">
+        <Link href="/" className="flex items-center text-blue-500 font-bold">
+          <img src="/logo-breezy.png" alt="Breezy Logo" className="h-8 w-8 object-contain" />
+          <span>Breezy</span>
         </Link>
       </div>
 
-      {/* SearchBar centrée seulement sur /feed */}
+      {/* SearchBar */}
       {user && isOnFeed && (
         <div className="flex-1 flex justify-center">
           <div className="w-full max-w-md">
@@ -27,26 +28,23 @@ const Navbar = () => {
         </div>
       )}
 
-      {/* Liens à droite */}
+      {/* Liens */}
       <div className="flex items-center space-x-4 flex-shrink-0">
         {user ? (
           <>
-            <Link href="/feed" className="hover:underline">
-              Fil d’actualités
-            </Link>
-            <Link href={`/profile/${user._id}`} className="hover:underline">
+            <Link href={`/profile/${user._id}`} className="text-blue-500 font-bold hover:underline">
               Profil
             </Link>
-            <button onClick={logout} className="text-red-500 hover:underline">
+            <button onClick={logout} className="text-red-500 font-bold hover:underline">
               Déconnexion
             </button>
           </>
         ) : (
           <>
-            <Link href="/login" className="hover:underline">
+            <Link href="/login" className="text-blue-500 font-bold hover:underline">
               Connexion
             </Link>
-            <Link href="/register" className="hover:underline">
+            <Link href="/register" className="text-blue-500 font-bold hover:underline">
               Inscription
             </Link>
           </>

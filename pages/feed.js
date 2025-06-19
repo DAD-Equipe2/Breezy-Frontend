@@ -77,8 +77,9 @@ export default function FeedPage() {
 
   return (
     <>
+      <div className="fixed inset-0 z-0 animate-bg-pan bg-gradient-to-r from-sky-300 via-blue-300 to-indigo-300 bg-[length:300%_300%]"></div>
       <Navbar />
-      <div className="max-w-2xl mx-auto mt-8 p-4 min-h-screen pt-20">
+      <div className="relative max-w-2xl mx-auto mt-8 p-4 min-h-screen pt-20 z-10">
         <form onSubmit={handlePostSubmit} className="mb-6">
           {error && (
             <div className="text-red-500 text-sm mb-2">{error}</div>
@@ -92,15 +93,17 @@ export default function FeedPage() {
             }}
             rows={3}
             maxLength={MAX_LEN}
-            className="w-full border px-3 py-2 rounded mb-2"
+            className="bg-gray-100 shadow-2xl rounded-xl p-4 w-full border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-400 transition-transform duration-200 hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)]"
           />
           <input
             type="text"
             placeholder="Tags (séparés par des virgules)"
             value={tagsInput}
             onChange={(e) => setTagsInput(e.target.value)}
-            className="w-full border px-3 py-2 rounded mb-2"
+            className="bg-white/30 backdrop-blur-md text-blue-600 placeholder-white/80 shadow-xl rounded-xl p-4 w-full border border-white/40 focus:outline-none focus:ring-2 focus:ring-blue-400 ..."
+            style={{ height: "56px" }}
           />
+          <div className="h-4" />
           <input
             type="file"
             accept="image/*,video/*"

@@ -86,8 +86,9 @@ export default function ProfilePage() {
 
   return (
     <>
+      <div className="fixed inset-0 z-0 animate-bg-pan bg-gradient-to-r from-sky-300 via-blue-300 to-indigo-300 bg-[length:300%_300%]"></div>
       <Navbar />
-      <div className="max-w-3xl mx-auto mt-8 p-4 min-h-screen pt-20">
+      <div className="relative max-w-2xl mx-auto mt-8 p-4 min-h-screen pt-20 z-10">
         <div className="flex items-center space-x-4">
           <img
             src={

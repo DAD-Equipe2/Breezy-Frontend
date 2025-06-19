@@ -132,7 +132,7 @@ export default function PostCard({ post, isOwn }) {
   };
 
   return (
-    <div className="bg-white shadow rounded p-4 mb-6">
+    <div className="bg-gray-100 shadow-2xl rounded-xl p-4 mb-6 border border-gray-200 transition-transform duration-200 hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)]">
       <div className="flex items-center space-x-3 mb-2">
         <img
           src={
@@ -146,7 +146,9 @@ export default function PostCard({ post, isOwn }) {
         <div>
           <p className="font-semibold">{post.author.username}</p>
           <p className="text-xs text-gray-500">
-            {new Date(post.createdAt).toLocaleString()}
+            {new Date(post.createdAt).toLocaleDateString()}{" "}
+            {new Date(post.createdAt)
+              .toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
           </p>
         </div>
       </div>

@@ -26,7 +26,7 @@ export default function SearchPage() {
   return (
     <>
       <Navbar />
-      <div className="max-w-2xl mx-auto mt-8 p-4">
+      <div className="max-w-2xl mx-auto mt-8 p-4 min-h-screen pt-20">
         <h2 className="text-2xl font-bold mb-4">
           Résultats pour « {query} »
         </h2>
