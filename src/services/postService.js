@@ -34,3 +34,10 @@ export const deletePost = async (postId) => {
   const res = await axios.delete(`${API_URL}/posts/${postId}`);
   return res.data;
 };
+
+export const searchPosts = async (query) => {
+  const res = await axios.get(`${API_URL}/posts/search`, {
+    params: { query },
+  });
+  return res.data.data;
+}

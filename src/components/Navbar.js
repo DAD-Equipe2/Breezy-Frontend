@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
+import SearchBar from "./SearchBar";
 
 const Navbar = () => {
   const { user, logout } = useContext(AuthContext);
@@ -14,6 +15,7 @@ const Navbar = () => {
       <div className="flex items-center space-x-4">
         {user ? (
           <>
+            <SearchBar />
             <Link href="/feed" className="hover:underline">
               Fil d’actualités
             </Link>
@@ -24,6 +26,7 @@ const Navbar = () => {
               Déconnexion
             </button>
           </>
+
         ) : (
           <>
             <Link href="/login" className="hover:underline">
