@@ -1,5 +1,7 @@
 import { useState, useContext } from "react";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
+import { motion } from "framer-motion";
+
 import Navbar from "../src/components/Navbar";
 import { AuthContext } from "../src/context/AuthContext";
 
@@ -15,11 +17,11 @@ export default function Register() {
   const [loading, setLoading] = useState(false);
 
   const handleChange = (e) =>
-    setFormData(f => ({ ...f, [e.target.name]: e.target.value }));
+    setFormData((f) => ({ ...f, [e.target.name]: e.target.value }));
 
   const handleFile = (e) => {
     const file = e.target.files[0];
-    if (file && file.size > 5*1024*1024) {
+    if (file && file.size > 5 * 1024 * 1024) {
       alert("5 Mo max");
       return;
     }
@@ -57,22 +59,39 @@ export default function Register() {
   };
 
   return (
-    <>
+    <div className="relative min-h-screen overflow-hidden flex flex-col">
+      {/* Fond animé */}
+      <div className="absolute inset-0 z-0 animate-bg-pan bg-gradient-to-r from-sky-300 via-blue-300 to-indigo-300 bg-[length:300%_300%]"></div>
+
+      {/* Navbar fixée */}
       <Navbar />
-      <div className="max-w-md mx-auto mt-12 p-6 bg-white shadow rounded">
-        <h2 className="text-2xl font-bold mb-4">Inscription</h2>
-        {error && (
-          <div className="bg-red-100 text-red-700 p-2 mb-4 rounded">{error}</div>
-        )}
-        <form onSubmit={handleSubmit} className="space-y-4">
+
+      {/* Formulaire */}
+      <main className="relative z-10 flex items-center justify-center px-4 min-h-screen pt-20">
+        <motion.form
+          onSubmit={handleSubmit}
+          initial={{ opacity: 0, y: 40 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1, ease: "easeOut" }}
+          className="bg-white/30 backdrop-blur-xl border border-white/50 rounded-3xl p-10 w-full max-w-sm shadow-2xl space-y-5 text-white"
+        >
+          <h1 className="text-2xl font-extrabold text-center">Inscription</h1>
+
+          {error && (
+            <div className="bg-red-500/80 text-white text-sm p-3 rounded text-center">
+              {error}
+            </div>
+          )}
+
           <input
             name="username"
             placeholder="Pseudo"
             required
             value={formData.username}
             onChange={handleChange}
-            className="w-full border px-3 py-2 rounded"
+            className="w-full p-3 rounded-xl bg-white/20 text-white placeholder-white/80 focus:outline-none focus:ring-2 focus:ring-blue-400"
           />
+
           <input
             type="email"
             name="email"
@@ -80,8 +99,9 @@ export default function Register() {
             required
             value={formData.email}
             onChange={handleChange}
-            className="w-full border px-3 py-2 rounded"
+            className="w-full p-3 rounded-xl bg-white/20 text-white placeholder-white/80 focus:outline-none focus:ring-2 focus:ring-blue-400"
           />
+
           <input
             type="password"
             name="password"
@@ -89,33 +109,33 @@ export default function Register() {
             required
             value={formData.password}
             onChange={handleChange}
-            className="w-full border px-3 py-2 rounded"
+            className="w-full p-3 rounded-xl bg-white/20 text-white placeholder-white/80 focus:outline-none focus:ring-2 focus:ring-blue-400"
           />
+
           <textarea
             name="bio"
             placeholder="Bio (optionnelle)"
             value={formData.bio}
             onChange={handleChange}
-            className="w-full border px-3 py-2 rounded"
+            className="w-full p-3 rounded-xl bg-white/20 text-white placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none"
           />
-          <div>
-            <label className="block font-medium">Avatar (optionnel)</label>
-            <input
-              type="file"
-              accept="image/*"
-              onChange={handleFile}
-              className="w-full"
-            />
-          </div>
+
+          <input
+            type="file"
+            accept="image/*"
+            onChange={handleFile}
+            className="text-white/80 file:bg-white/20 file:border-none file:rounded-xl file:px-4 file:py-2 file:text-white file:cursor-pointer"
+          />
+
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-blue-500 text-white px-3 py-2 rounded hover:bg-blue-600 disabled:opacity-50"
+            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 rounded-xl w-full font-semibold transition-transform transform hover:scale-105 disabled:opacity-60"
           >
             {loading ? "Inscription..." : "S’inscrire"}
           </button>
-        </form>
-      </div>
-    </>
+        </motion.form>
+      </main>
+    </div>
   );
 }

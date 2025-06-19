@@ -1,5 +1,8 @@
+'use client';
 import { useState, useContext } from "react";
 import { useRouter } from "next/router";
+import { motion } from "framer-motion";
+
 import Navbar from "../src/components/Navbar";
 import { AuthContext } from "../src/context/AuthContext";
 import { login as loginUser } from "../src/services/authService";
@@ -34,48 +37,59 @@ export default function Login() {
   };
 
   return (
-    <>
+  <div className="relative min-h-screen overflow-hidden flex flex-col">
+    {/* Background animé */}
+    <div className="absolute inset-0 z-0 animate-bg-pan bg-gradient-to-r from-sky-300 via-blue-300 to-indigo-300 bg-[length:300%_300%]"></div>
+
+    {/* Navbar + Main Content */}
+    <div className="relative z-10 flex flex-col flex-grow">
       <Navbar />
-      <div className="max-w-md mx-auto mt-12 p-6 bg-white shadow rounded">
-        <h2 className="text-2xl font-bold mb-4">Connexion</h2>
-        {error && (
-          <div className="bg-red-100 text-red-700 p-2 mb-4 rounded">
-            {error}
-          </div>
-        )}
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block font-medium">
-              Email ou Nom d’utilisateur
-            </label>
-            <input
-              name="emailOrUsername"
-              value={formData.emailOrUsername}
-              onChange={handleChange}
-              required
-              className="w-full border px-3 py-2 rounded"
-            />
-          </div>
-          <div>
-            <label className="block font-medium">Mot de passe</label>
-            <input
-              type="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              required
-              className="w-full border px-3 py-2 rounded"
-            />
-          </div>
+      <main className="relative z-10 flex items-center justify-center px-4 min-h-screen pt-20">
+        <motion.form
+          onSubmit={handleSubmit}
+          initial={{ opacity: 0, y: 40 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1, ease: "easeOut" }}
+          className="bg-white/30 backdrop-blur-xl border border-white/50 rounded-3xl p-10 w-full max-w-sm shadow-2xl space-y-6 text-white"
+        >
+          <h1 className="text-2xl font-extrabold text-white text-center">Connexion</h1>
+
+          {error && (
+            <div className="bg-red-500/80 text-white text-sm p-3 rounded text-center">
+              {error}
+            </div>
+          )}
+
+          <input
+            name="emailOrUsername"
+            type="text"
+            placeholder="Email ou nom d'utilisateur"
+            value={formData.emailOrUsername}
+            onChange={handleChange}
+            required
+            className="w-full p-3 rounded-xl bg-white/20 text-white placeholder-white/80 focus:outline-none focus:ring-2 focus:ring-blue-400"
+          />
+
+          <input
+            name="password"
+            type="password"
+            placeholder="Mot de passe"
+            value={formData.password}
+            onChange={handleChange}
+            required
+            className="w-full p-3 rounded-xl bg-white/20 text-white placeholder-white/80 focus:outline-none focus:ring-2 focus:ring-blue-400"
+          />
+
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-green-500 text-white px-3 py-2 rounded hover:bg-green-600 disabled:opacity-50"
+            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 rounded-xl w-full font-semibold transition-transform transform hover:scale-105 disabled:opacity-60"
           >
             {loading ? "Connexion..." : "Se connecter"}
           </button>
-        </form>
-      </div>
-    </>
-  );
+        </motion.form>
+      </main>
+    </div>
+  </div>
+);
 }

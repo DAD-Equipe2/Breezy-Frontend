@@ -87,7 +87,7 @@ export default function ProfilePage() {
   return (
     <>
       <Navbar />
-      <div className="max-w-3xl mx-auto mt-8 p-4">
+      <div className="max-w-3xl mx-auto mt-8 p-4 min-h-screen pt-20">
         <div className="flex items-center space-x-4">
           <img
             src={
