@@ -95,6 +95,9 @@ export default function FeedPage() {
             maxLength={MAX_LEN}
             className="bg-gray-100 shadow-2xl rounded-xl p-4 w-full border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-400 transition-transform duration-200 hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)]"
           />
+          <div className="text-right text-xs text-gray-600 mb-2">
+            {newPostContent.length}/{MAX_LEN}
+          </div>
           <input
             type="text"
             placeholder="Tags (séparés par des virgules)"

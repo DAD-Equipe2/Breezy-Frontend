@@ -21,6 +21,7 @@ export default function PostCard({ post, isOwn }) {
 
   const [likesCount, setLikesCount] = useState(0);
   const [isLiked, setIsLiked] = useState(false);
+
   const [comments, setComments] = useState([]);
   const [showComments, setShowComments] = useState(false);
   const [newComment, setNewComment] = useState("");
@@ -30,6 +31,7 @@ export default function PostCard({ post, isOwn }) {
   const [editContent, setEditContent] = useState(post.content);
   const [editTags, setEditTags] = useState(post.tags.join(", "));
   const [editMediaFile, setEditMediaFile] = useState(null);
+  const [removeMedia, setRemoveMedia] = useState(false);
   const [errorEdit, setErrorEdit] = useState("");
 
   useEffect(() => {
@@ -118,6 +120,7 @@ export default function PostCard({ post, isOwn }) {
     if (editMediaFile) {
       form.append("media", editMediaFile);
     }
+    form.append("removeMedia", removeMedia ? "true" : "false");
     try {
       const updated = await modifyPost(post._id, form);
       post.content = updated.content;
@@ -125,6 +128,7 @@ export default function PostCard({ post, isOwn }) {
       post.mediaURL = updated.mediaURL;
       setIsEditing(false);
       setEditMediaFile(null);
+      setRemoveMedia(false);
     } catch (err) {
       console.error(err);
       setErrorEdit("Erreur lors de la mise à jour");
@@ -176,6 +180,42 @@ export default function PostCard({ post, isOwn }) {
             value={editTags}
             onChange={(e) => setEditTags(e.target.value)}
           />
+          {post.mediaURL && (
+            <div className="mb-2">
+              {!removeMedia && (() => {
+                const url = post.mediaURL.startsWith("http")
+                  ? post.mediaURL
+                  : `${API_URL}${post.mediaURL}`;
+                const ext = post.mediaURL.split(".").pop().toLowerCase();
+                const imageExt = ["png", "jpg", "jpeg", "gif"];
+                if (imageExt.includes(ext)) {
+                  return (
+                    <img
+                      src={url}
+                      className="w-full max-h-48 object-contain rounded mb-1"
+                    />
+                  );
+                } else {
+                  return (
+                    <video
+                      src={url}
+                      controls
+                      className="w-full max-h-48 object-contain rounded mb-1"
+                    />
+                  );
+                }
+              })()}
+              <label className="inline-flex items-center mt-1">
+                <input
+                  type="checkbox"
+                  checked={removeMedia}
+                  onChange={() => setRemoveMedia((r) => !r)}
+                  className="form-checkbox mr-2"
+                />
+                Supprimer le média
+              </label>
+            </div>
+          )}
           <input
             type="file"
             accept="image/*,video/*"
@@ -197,6 +237,7 @@ export default function PostCard({ post, isOwn }) {
                 setEditContent(post.content);
                 setEditTags(post.tags.join(", "));
                 setEditMediaFile(null);
+                setRemoveMedia(false);
                 setErrorEdit("");
               }}
             >
@@ -223,31 +264,30 @@ export default function PostCard({ post, isOwn }) {
             </div>
           )}
 
-          {post.mediaURL &&
-            (() => {
-              const url = post.mediaURL.startsWith("http")
-                ? post.mediaURL
-                : `${API_URL}${post.mediaURL}`;
-              const ext = post.mediaURL.split(".").pop().toLowerCase();
-              const imageExt = ["png", "jpg", "jpeg", "gif"];
-              if (imageExt.includes(ext)) {
-                return (
-                  <img
-                    src={url}
-                    alt="Media"
-                    className="w-full max-h-96 object-contain rounded mb-3"
-                  />
-                );
-              } else {
-                return (
-                  <video
-                    src={url}
-                    controls
-                    className="w-full max-h-96 object-contain rounded mb-3"
-                  />
-                );
-              }
-            })()}
+          {post.mediaURL && (() => {
+            const url = post.mediaURL.startsWith("http")
+              ? post.mediaURL
+              : `${API_URL}${post.mediaURL}`;
+            const ext = post.mediaURL.split(".").pop().toLowerCase();
+            const imageExt = ["png", "jpg", "jpeg", "gif"];
+            if (imageExt.includes(ext)) {
+              return (
+                <img
+                  src={url}
+                  alt="Media"
+                  className="w-full max-h-96 object-contain rounded mb-3"
+                />
+              );
+            } else {
+              return (
+                <video
+                  src={url}
+                  controls
+                  className="w-full max-h-96 object-contain rounded mb-3"
+                />
+              );
+            }
+          })()}
         </>
       )}
 
