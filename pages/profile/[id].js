@@ -1,8 +1,10 @@
 import { useEffect, useState, useContext } from "react";
 import { useRouter } from "next/router";
+
 import Navbar from "../../src/components/Navbar";
 import PostCard from "../../src/components/PostCard";
 import FollowButton from "../../src/components/FollowButton";
+import ImageUploadButton from "../../src/components/ImageUploadButton";
 import { AuthContext } from "../../src/context/AuthContext";
 import { getProfile, updateProfile } from "../../src/services/userService";
 
@@ -141,13 +143,14 @@ export default function ProfilePage() {
               />
             </div>
             <div>
-              <label className="block font-medium">Nouvel avatar :</label>
-              <input
-                type="file"
-                accept="image/*"
-                onChange={(e) => setSelectedFile(e.target.files[0])}
-                className="block"
-              />
+              <div className="flex flex-col items-center">
+                <ImageUploadButton
+                  value={selectedFile}
+                  onChange={file => setSelectedFile(file)}
+                  accept="image/*"
+                />
+                <span className="text-xs font-semibold text-blue-700 mt-2">Nouvel avatar</span>
+              </div>
             </div>
             <div className="flex space-x-2">
               <button
@@ -178,7 +181,7 @@ export default function ProfilePage() {
         {posts.length === 0 ? (
           <p>Aucun post pour le moment.</p>
         ) : (
-          posts.map((post) => <PostCard key={post._id} post={post} isOwn= {isOwn} />)
+          posts.map((post) => <PostCard key={post._id} post={post} isOwn={isOwn} />)
         )}
       </div>
     </>

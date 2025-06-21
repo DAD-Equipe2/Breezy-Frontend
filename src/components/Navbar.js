@@ -13,9 +13,9 @@ const Navbar = () => {
     <nav className="fixed top-0 left-0 right-0 bg-transparent backdrop-blur-md p-4 flex items-center justify-between z-30">
       {/* Logo */}
       <div className="flex-shrink-0 flex items-center">
-        <Link href="/" className="flex items-center text-blue-500 font-bold">
-          <img src="/logo-breezy.png" alt="Breezy Logo" className="h-8 w-8 object-contain" />
-          <span>Breezy</span>
+        <Link href="/" className="flex items-center text-blue-500 font-bold text-2xl">
+          <img src="/logo-breezy.png" alt="Breezy Logo" className="h-12 w-12 object-contain mr-1" />
+          <span className="text-2xl">Breezy</span>
         </Link>
       </div>
 

@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 
 import Navbar from "../src/components/Navbar";
 import { AuthContext } from "../src/context/AuthContext";
+import ImageUploadButton from "../src/components/ImageUploadButton";
 
 export default function Register() {
   const router = useRouter();
@@ -125,12 +126,15 @@ export default function Register() {
             className="w-full p-3 rounded-xl bg-white/20 text-white placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none"
           />
 
-          <input
-            type="file"
-            accept="image/*"
-            onChange={handleFile}
-            className="text-white/80 file:bg-white/20 file:border-none file:rounded-xl file:px-4 file:py-2 file:text-white file:cursor-pointer"
-          />
+          <div className="flex items-center justify-center gap-4">
+            <div className="flex flex-col items-center">
+              <ImageUploadButton onChange={handleFile} id="register-avatar-upload" />
+              <span className="text-xs text-white/70 mt-1">Ajouter un avatar</span>
+            </div>
+            {avatarFile && (
+              <span className="text-xs text-white/80">{avatarFile.name}</span>
+            )}
+          </div>
 
           <button
             type="submit"

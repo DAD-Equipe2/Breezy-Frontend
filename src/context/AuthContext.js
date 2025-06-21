@@ -50,6 +50,7 @@ export const AuthProvider = ({ children }) => {
     delete axios.defaults.headers.common["Authorization"];
     setUser(null);
     setToken(null);
+    window.location.href = "/";
   };
 
   return (
