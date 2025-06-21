@@ -6,10 +6,14 @@ export const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const storedToken = localStorage.getItem("breezyToken");
-    if (!storedToken) return;
+    if (!storedToken){
+      setLoading(false);
+      return;
+    }
 
     axios.defaults.headers.common["Authorization"] = `Bearer ${storedToken}`;
     setToken(storedToken);
@@ -23,10 +27,12 @@ export const AuthProvider = ({ children }) => {
           localStorage.removeItem("breezyToken");
           setToken(null);
         }
+        setLoading(false);
       })
       .catch(() => {
         localStorage.removeItem("breezyToken");
         setToken(null);
+        setLoading(false);
       });
   }, []);
 
@@ -52,6 +58,10 @@ export const AuthProvider = ({ children }) => {
     setToken(null);
     window.location.href = "/";
   };
+
+  if (loading) {
+    return null
+  }
 
   return (
     <AuthContext.Provider value={{ user, token, login, logout }}>

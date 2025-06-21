@@ -17,3 +17,14 @@ export const searchUsers = async (query) => {
   const res = await axios.get(`${API_BASE}/users/search`, { params: { query } });
   return res.data
 }
+
+export async function deleteProfile() {
+  const token = localStorage.getItem("breezyToken");
+  const res = await axios.delete(`${API_BASE}/users/profile`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  if (!res.data.success) throw new Error(res.data.message || "Erreur lors de la suppression du profil");
+  return res.data;
+}

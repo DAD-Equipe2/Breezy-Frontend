@@ -7,7 +7,7 @@ function MyApp({ Component, pageProps }) {
     <>
       <Head>
         <link rel="icon" href="/logo-breezy.png" />
-        <title>Breezy</title> {/* Tu peux aussi modifier le titre ici */}
+        <title>Breezy</title>
       </Head>
       <AuthProvider>
         <Component {...pageProps} />

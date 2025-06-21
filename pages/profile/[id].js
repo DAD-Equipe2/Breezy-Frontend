@@ -6,7 +6,7 @@ import PostCard from "../../src/components/PostCard";
 import FollowButton from "../../src/components/FollowButton";
 import ImageUploadButton from "../../src/components/ImageUploadButton";
 import { AuthContext } from "../../src/context/AuthContext";
-import { getProfile, updateProfile } from "../../src/services/userService";
+import { getProfile, updateProfile, deleteProfile } from "../../src/services/userService";
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -20,6 +20,10 @@ export default function ProfilePage() {
   const [isEditing, setIsEditing] = useState(false);
   const [editForm, setEditForm] = useState({ bio: "", avatarURL: "" });
   const [selectedFile, setSelectedFile] = useState(null);
+
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const { logout } = useContext(AuthContext)
+
 
   useEffect(() => {
     if (!router.isReady) return;
@@ -80,6 +84,17 @@ export default function ProfilePage() {
     }
   };
 
+  const handleConfirmDelete = async () => {
+    try {
+      await deleteProfile();
+      logout();
+      localStorage.removeItem("breezyToken");
+      router.replace("/");
+    } catch (err) {
+      alert(err.response?.data?.message || err.message);
+    }
+  }
+
   if (loading) return <div>Chargement…</div>;
   if (error) return <div className="text-red-600">{error}</div>;
 
@@ -109,12 +124,20 @@ export default function ProfilePage() {
           </div>
           <div className="ml-auto">
             {isOwn ? (
-              <button
-                className="px-3 py-1 bg-yellow-400 text-white rounded"
-                onClick={() => setIsEditing(true)}
-              >
-                Modifier le profil
-              </button>
+              <div className="flex gap-2">
+                <button
+                  className="px-3 py-1 bg-yellow-400 text-white rounded"
+                  onClick={() => setIsEditing(true)}
+                >
+                  Modifier le profil
+                </button>
+                <button 
+                  className="px-3 py-1 bg-red-500 text-white rounded"
+                  onClick={() => setShowDeleteModal(true)}
+                >
+                  Supprimer le profil
+                </button>
+              </div>              
             ) : (
               currentUser && <FollowButton targetUserId={user._id} />
             )}
@@ -183,6 +206,32 @@ export default function ProfilePage() {
         ) : (
           posts.map((post) => <PostCard key={post._id} post={post} isOwn={isOwn} />)
         )}
+
+        {showDeleteModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+            <div className="bg-white rounded shadow-lg p-6 max-w-sm w-full">
+              <h2 className="text-lg font-bold mb-2">Supprimer le profil</h2>
+              <p className="mb-4 text-gray-700">
+                Êtes-vous sûr de vouloir supprimer votre compte ? Cette action est <span className="font-semibold text-red-600">irréversible</span>.
+              </p>
+              <div className="flex justify-end gap-2">
+                <button
+                  className="px-4 py-2 bg-gray-300 rounded"
+                  onClick={() => setShowDeleteModal(false)}
+                >
+                  Annuler
+                </button>
+                <button
+                  className="px-4 py-2 bg-red-600 text-white rounded"
+                  onClick={handleConfirmDelete}
+                >
+                  Supprimer
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
       </div>
     </>
   );
