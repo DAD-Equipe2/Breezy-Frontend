@@ -103,7 +103,7 @@ export default function FeedPage() {
               placeholder="Tags (séparés par des virgules)"
               value={tagsInput}
               onChange={(e) => setTagsInput(e.target.value)}
-              className="bg-blue-100 text-blue-600 placeholder-white/80 shadow-xl rounded-xl p-4 w-full border border-white/40 focus:outline-none focus:ring-2 focus:ring-blue-400 ..."
+              className="bg-blue-200 text-blue-600 placeholder-white shadow-xl rounded-xl p-4 w-full border border-white/40 focus:outline-none focus:ring-2 focus:ring-blue-400 ..."
               style={{ height: "56px" }}
             />
             <div className="h-4" />

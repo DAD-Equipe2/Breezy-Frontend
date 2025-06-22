@@ -30,7 +30,9 @@ const CommentSection = ({
             <div>
               <p className="font-medium text-sm">{comment.author.username}</p>
               <p className="text-xs text-gray-500">
-                {new Date(comment.createdAt).toLocaleString()}
+                {new Date(comment.createdAt).toLocaleDateString()}{" "}
+                {new Date(comment.createdAt)
+                  .toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
               </p>
             </div>
             {replyToId === comment._id && (

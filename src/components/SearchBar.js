@@ -20,12 +20,11 @@ export function SearchBar() {
           placeholder="Recherche par #tag ou texte"
           value={query}
           onChange={e => setQuery(e.target.value)}
-          className="border px-2 py-1 rounded w-full pr-10 focus:outline-none focus:ring-2 focus:ring-blue-400"
+          className="border-none px-4 py-2 rounded-full w-full pr-12 bg-white shadow focus:outline-none focus:ring-2 focus:ring-blue-400 focus:shadow-lg transition-all duration-200 text-gray-800 placeholder-gray-400"
         />
         <button
           type="submit"
-          className="absolute right-2 top-1/2 -translate-y-1/2 text-blue-500 hover:text-blue-700"
-          tabIndex={-1}
+          className="absolute right-2 top-1/2 -translate-y-1/2 bg-blue-500 hover:bg-blue-600 text-white rounded-full p-2 shadow transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-400"
           aria-label="Rechercher"
         >
           {/* Icone recherche */}

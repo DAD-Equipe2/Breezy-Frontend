@@ -1,17 +1,12 @@
 import { useState, useEffect, useContext } from "react";
+import Link from "next/link";
+
 import { AuthContext } from "../context/AuthContext";
-import {
-  likePost,
-  unlikePost,
-  getPostLikes,
-} from "../services/likeService";
-import {
-  getComments,
-  addComment,
-  replyToComment,
-} from "../services/commentService";
+import { likePost, unlikePost, getPostLikes } from "../services/likeService";
+import { getComments, addComment, replyToComment } from "../services/commentService";
 import { modifyPost } from "../services/postService";
 import CommentSection from "./CommentSection";
+import EditButton from "./EditButton";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 const MAX_LEN = 280;
@@ -23,6 +18,7 @@ export default function PostCard({ post, isOwn }) {
   const [isLiked, setIsLiked] = useState(false);
 
   const [comments, setComments] = useState([]);
+  const [commentsCount, setCommentsCount] = useState(post.commentsCount || 0);
   const [showComments, setShowComments] = useState(false);
   const [newComment, setNewComment] = useState("");
   const [replyToId, setReplyToId] = useState(null);
@@ -48,6 +44,18 @@ export default function PostCard({ post, isOwn }) {
     })();
   }, [currentUser, post._id]);
 
+  // Ajout : charger le nombre de commentaires au montage
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await getComments(post._id);
+        setCommentsCount(res.data.length);
+      } catch (err) {
+        // ignore
+      }
+    })();
+  }, [post._id]);
+
   const handleLikeToggle = async () => {
     if (!currentUser) return;
     try {
@@ -71,6 +79,7 @@ export default function PostCard({ post, isOwn }) {
       try {
         const res = await getComments(post._id);
         setComments(res.data);
+        setCommentsCount(res.data.length); // Met à jour le nombre lors de l'ouverture
       } catch (err) {
         console.error(err);
       }
@@ -136,7 +145,13 @@ export default function PostCard({ post, isOwn }) {
   };
 
   return (
-    <div className="bg-gray-100 shadow-2xl rounded-xl p-4 mb-6 border border-gray-200 transition-transform duration-200 hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)]">
+    <div className="bg-gray-100 shadow-2xl rounded-xl p-4 mb-6 border border-gray-200 transition-transform duration-200 hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)] relative">
+      {/* modif */}
+      {isOwn && !isEditing && (
+        <div className="absolute top-3 right-3 z-10">
+          <EditButton onClick={() => setIsEditing(true)} title="Modifier le post" />
+        </div>
+      )}
       <div className="flex items-center space-x-3 mb-2">
         <img
           src={
@@ -148,7 +163,12 @@ export default function PostCard({ post, isOwn }) {
           className="w-10 h-10 rounded-full object-cover"
         />
         <div>
-          <p className="font-semibold">{post.author.username}</p>
+          <Link
+            href={`/profile/${post.author._id}`}
+            className="font-semibold hover:underline text-blue-700"
+          >
+            {post.author.username}
+          </Link>
           <p className="text-xs text-gray-500">
             {new Date(post.createdAt).toLocaleDateString()}{" "}
             {new Date(post.createdAt)
@@ -298,25 +318,22 @@ export default function PostCard({ post, isOwn }) {
             isLiked ? "text-red-500" : "text-gray-500"
           } hover:opacity-80`}
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-5 w-5"
-            fill={isLiked ? "currentColor" : "none"}
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M5 15l7-7 7 7"
-            />
-          </svg>
+          {/* like */}
+          {isLiked ? (
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41 0.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+            </svg>
+          ) : (
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41 0.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+            </svg>
+          )}
           <span>{likesCount}</span>
         </button>
+        {/* commentaires*/}
         <button
           onClick={toggleComments}
-          className="flex items-center space-x-1 text-gray-500 hover:opacity-80"
+          className="flex items-center text-gray-500 hover:opacity-80"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -332,16 +349,10 @@ export default function PostCard({ post, isOwn }) {
               d="M8 10h.01M12 10h.01M16 10h.01M21 15a2 2 0 002-2V7a2 2 0 00-2-2H3a2 2 0 00-2 2v6a2 2 0 002 2h3l3 3 3-3h9z"
             />
           </svg>
-          <span>{comments.length}</span>
+          {commentsCount > 0 && (
+            <span className="ml-1 font-semibold">{commentsCount}</span>
+          )}
         </button>
-        {isOwn && !isEditing && (
-          <button
-            onClick={() => setIsEditing(true)}
-            className="px-2 py-1 bg-blue-500 text-white rounded ml-2"
-          >
-            Modifier
-          </button>
-        )}
       </div>
 
       {showComments && (

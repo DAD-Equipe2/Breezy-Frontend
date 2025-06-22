@@ -3,6 +3,7 @@ import { useRouter } from "next/router";
 
 import Navbar from "../../src/components/Navbar";
 import PostCard from "../../src/components/PostCard";
+import EditButton from "../../src/components/EditButton";
 import FollowButton from "../../src/components/FollowButton";
 import ImageUploadButton from "../../src/components/ImageUploadButton";
 import { AuthContext } from "../../src/context/AuthContext";
@@ -106,98 +107,128 @@ export default function ProfilePage() {
       <div className="fixed inset-0 z-0 animate-bg-pan bg-gradient-to-r from-sky-300 via-blue-300 to-indigo-300 bg-[length:300%_300%]"></div>
       <Navbar />
       <div className="relative max-w-2xl mx-auto mt-8 p-4 min-h-screen pt-20 z-10">
-        <div className="flex items-center space-x-4">
-          <img
-            src={
-              user.avatarURL
-                ? `${process.env.NEXT_PUBLIC_API_URL}${user.avatarURL}`
-                : "/default-avatar.png"
-            }
-            alt="Avatar"
-            className="w-20 h-20 rounded-full object-cover"
-          />
-          <div>
-            <h1 className="text-2xl font-bold">{user.username}</h1>
-            <p className="text-sm text-gray-500">
+        {/* bloc profil */}
+        <div className="relative bg-gradient-to-r from-blue-400 via-sky-300 to-indigo-400 rounded-3xl shadow-lg p-6 flex flex-col sm:flex-row items-center gap-6 mb-6 border border-blue-200/60">
+          {/* Boutons */}
+          {isOwn && (
+            <div className="absolute top-4 right-4 flex gap-2 z-10">
+              <EditButton onClick={() => setIsEditing(true)} title="Modifier le profil" />
+              
+              <button
+                className="w-10 h-10 flex items-center justify-center rounded-full bg-red-400 hover:bg-red-500 text-white text-xl shadow transition group"
+                onClick={() => setShowDeleteModal(true)}
+                title="Supprimer le profil"
+                aria-label="Supprimer le profil"
+                type="button"
+              >
+                <span className="group-hover:scale-110 transition-transform">🗑️</span>
+              </button>
+            </div>
+          )}
+          <div className="relative flex-shrink-0">
+            <img
+              src={
+                user.avatarURL
+                  ? `${process.env.NEXT_PUBLIC_API_URL}${user.avatarURL}`
+                  : "/default-avatar.png"
+              }
+              alt="Avatar"
+              className="w-28 h-28 sm:w-32 sm:h-32 rounded-full object-cover border-4 border-white shadow-xl bg-white"
+            />
+          </div>
+          <div className="flex-1 flex flex-col items-center sm:items-start min-w-0">
+            <h1 className="text-3xl font-extrabold text-gray-900 mb-1 flex items-center gap-2">
+              {user.username}
+              {user.isVerified && (
+                <span className="inline-block align-middle text-blue-500" title="Compte vérifié">✔️</span>
+              )}
+            </h1>
+            <p className="text-sm text-gray-600 mb-2">
               Inscrit le {new Date(user.createdAt).toLocaleDateString()}
             </p>
-          </div>
-          <div className="ml-auto">
-            {isOwn ? (
-              <div className="flex gap-2">
-                <button
-                  className="px-3 py-1 bg-yellow-400 text-white rounded"
-                  onClick={() => setIsEditing(true)}
-                >
-                  Modifier le profil
-                </button>
-                <button 
-                  className="px-3 py-1 bg-red-500 text-white rounded"
-                  onClick={() => setShowDeleteModal(true)}
-                >
-                  Supprimer le profil
-                </button>
-              </div>              
-            ) : (
-              currentUser && <FollowButton targetUserId={user._id} />
+            {user.bio && (
+              <div className="bg-white/80 border border-blue-200/60 rounded-xl px-4 py-3 shadow-inner w-full max-w-xl mt-2 overflow-x-auto" style={{maxWidth: '400px'}}>
+                <p className="text-gray-800 whitespace-pre-line break-words text-base leading-relaxed max-w-full">
+                  {user.bio}
+                </p>
+              </div>
             )}
           </div>
-        </div>
-
-        {user.bio && (
-          <div className="mt-4 bg-gray-100 border-l-4 border-blue-500 p-4 rounded">
-            <p className="text-gray-800 whitespace-pre-line break-words ">{user.bio}</p>
-          </div>
-        )}
-
-        {isOwn && isEditing && (
-          <form
-            onSubmit={handleEditSubmit}
-            className="mt-4 space-y-4 bg-gray-50 p-4 rounded"
-          >
-            <h2 className="text-lg font-medium">Éditer votre profil</h2>
-            <div>
-              <label className="block font-medium">Bio :</label>
-              <textarea
-                name="bio"
-                value={editForm.bio}
-                onChange={handleEditChange}
-                className="w-full border px-2 py-1 rounded"
-              />
+          {/* Plus de boutons ici, ils sont en haut à droite */}
+          {!isOwn && currentUser && (
+            <div className="sm:ml-auto mt-4 sm:mt-0 flex flex-col items-center gap-2">
+              {/* Les boutons d'action sont désormais en haut à droite, on retire ici */}
+              {!isOwn && currentUser && <FollowButton targetUserId={user._id} />}
             </div>
-            <div>
-              <div className="flex flex-col items-center">
-                <ImageUploadButton
-                  value={selectedFile}
-                  onChange={file => setSelectedFile(file)}
-                  accept="image/*"
-                />
-                <span className="text-xs font-semibold text-blue-700 mt-2">Nouvel avatar</span>
+          )}
+        </div>
+        {isOwn && isEditing && (
+          <>
+            <div className="fixed inset-0 bg-black/30 backdrop-blur-sm z-40 flex items-center justify-center"></div>
+            {/* Modal modif */}
+            <div className="fixed inset-0 z-50 flex items-center justify-center">
+              <div className="w-full max-w-md mx-auto">
+                <form
+                  onSubmit={handleEditSubmit}
+                  className="relative bg-white rounded-2xl shadow-2xl p-8 space-y-5 border border-blue-200/60"
+                >
+                  {/* Croix */}
+                  <button
+                    type="button"
+                    className="absolute top-3 right-3 text-gray-400 hover:text-red-500 text-2xl font-bold focus:outline-none"
+                    onClick={() => {
+                      setIsEditing(false);
+                      setSelectedFile(null);
+                    }}
+                    aria-label="Fermer"
+                  >
+                    ×
+                  </button>
+                  <h2 className="text-lg font-bold text-gray-900 text-center">Éditer votre profil</h2>
+                  <div>
+                    <label className="block font-medium text-gray-700">Bio :</label>
+                    <textarea
+                      name="bio"
+                      value={editForm.bio}
+                      onChange={handleEditChange}
+                      className="w-full border px-2 py-1 rounded"
+                    />
+                  </div>
+                  <div>
+                    <div className="flex flex-col items-center">
+                      <ImageUploadButton
+                        value={selectedFile}
+                        onChange={file => setSelectedFile(file)}
+                        accept="image/*"
+                      />
+                      <span className="text-xs font-semibold text-blue-700 mt-2">Nouvel avatar</span>
+                    </div>
+                  </div>
+                  <div className="flex space-x-2 justify-center">
+                    <button
+                      type="submit"
+                      className="px-4 py-2 bg-green-500 text-white rounded"
+                    >
+                      Sauvegarder
+                    </button>
+                    <button
+                      type="button"
+                      className="px-4 py-2 bg-gray-300 rounded"
+                      onClick={() => {
+                        setIsEditing(false);
+                        setSelectedFile(null);
+                      }}
+                    >
+                      Annuler
+                    </button>
+                  </div>
+                </form>
               </div>
             </div>
-            <div className="flex space-x-2">
-              <button
-                type="submit"
-                className="px-4 py-2 bg-green-500 text-white rounded"
-              >
-                Sauvegarder
-              </button>
-              <button
-                type="button"
-                className="px-4 py-2 bg-gray-300 rounded"
-                onClick={() => {
-                  setIsEditing(false);
-                  setSelectedFile(null);
-                }}
-              >
-                Annuler
-              </button>
-            </div>
-          </form>
+          </>
         )}
 
         <hr className="my-6" />
-
         <h2 className="text-xl font-semibold mb-4">
           Publications de {user.username}
         </h2>
