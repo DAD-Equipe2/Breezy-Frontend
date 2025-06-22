@@ -1,5 +1,5 @@
 'use client';
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect } from "react";
 import { useRouter } from "next/router";
 import { motion } from "framer-motion";
 
@@ -11,12 +11,24 @@ export default function Login() {
   const router = useRouter();
   const { login } = useContext(AuthContext);
 
+  const { user } = useContext(AuthContext);
+
   const [formData, setFormData] = useState({
     emailOrUsername: "",
     password: "",
   });
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (user) {
+      router.replace("/feed");
+    }
+  }, [user, router]);
+
+  if (loading || user) {
+    return <div className="flex items-center justify-center min-h-screen">Chargement...</div>;
+  }
 
   const handleChange = (e) =>
     setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
@@ -27,7 +39,7 @@ export default function Login() {
     setError(null);
     try {
       const data = await loginUser(formData);
-      login(data.token);
+      login(data.accessToken);
       router.push("/feed");
     } catch (err) {
       const apiMessage = err.response?.data?.message;

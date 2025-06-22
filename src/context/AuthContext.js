@@ -69,3 +69,42 @@ export const AuthProvider = ({ children }) => {
     </AuthContext.Provider>
   );
 };
+
+const refreshAccessToken = async () => {
+  try {
+    const res = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/auth/refresh-token`, {}, { withCredentials: true });
+    const data = res.data;
+    if (data.success) {
+      localStorage.setItem("breezyToken", data.accessToken);
+      axios.defaults.headers.common["Authorization"] = `Bearer ${data.accessToken}`;
+      setToken(data.accessToken)
+      return data.accessToken;
+    } else {
+      logout();
+      return null;
+    }  
+  } catch (error) {
+    logout();
+    return null;
+  }
+};
+
+axios.interceptors.response.use(
+  res => res,
+  async (error) => {
+    const originalRequest = error.config;
+    if (
+      error.response &&
+      error.response.status === 401 &&
+      !originalRequest._retry
+    ) {
+      originalRequest._retry = true;
+      const newToken = await refreshAccessToken();
+      if (newToken) {
+        axios.defaults.headers.common["Authorization"] = `Bearer ${newToken}`;
+        return axios(originalRequest);
+      }
+    }
+    return Promise.reject(error);
+  }
+);

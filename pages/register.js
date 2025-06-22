@@ -9,6 +9,7 @@ import ImageUploadButton from "../src/components/ImageUploadButton";
 export default function Register() {
   const router = useRouter();
   const { login } = useContext(AuthContext);
+  const { token } = useContext(AuthContext);
 
   const [formData, setFormData] = useState({
     username: "", email: "", password: "", bio: ""
@@ -46,19 +47,23 @@ export default function Register() {
           data.append("avatarUrl", "/default-avatar.png");
         }
 
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/auth/register`,
-        {
-          method: "POST",
-          body: data,
-        }
-      );
-      const json = await res.json();
-      if (!json.success) throw new Error(json.message);
+        const headers = token ? { Authorization: `Bearer ${token}` } : {};
 
-      login(json.data.token);
-      router.push("/feed");
-    } catch (err) {
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/auth/register`,
+          {
+            method: "POST",
+            body: data,
+            headers,
+          }
+        );
+
+        const json = await res.json();
+        if (!json.success) throw new Error(json.message);
+
+        login(json.data.accessToken);
+        router.push("/feed");
+      } catch (err) {
       setError(err.message || "Erreur inscription");
       setLoading(false);
     }

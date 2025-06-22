@@ -6,8 +6,15 @@ import { AuthContext } from '../src/context/AuthContext';
 import { useRouter } from 'next/navigation';
 
 export default function Home() {
-  const { user } = useContext(AuthContext);
+  const { user, loading } = useContext(AuthContext);
   const router = useRouter();
+
+  if (loading) return <div>Chargement ...</div>
+
+  if (user) {
+    router.replace('/feed');
+    return null;
+  }
 
   return (
     <>
@@ -22,25 +29,21 @@ export default function Home() {
             <p className="text-white text-lg mb-10 font-semibold drop-shadow-md">
               Exprime-toi. Inspire. Envole-toi avec <span className="text-blue-600 font-semibold">Breezy</span>.
             </p>
-
-            {user ? (
-              router.push('/feed')
-            ) : (
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Link
-                  href="/register"
-                  className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-full text-sm font-bold transition-transform transform hover:scale-105 shadow-lg"
-                >
-                  Créer un compte
-                </Link>
-                <Link
-                  href="/login"
-                  className="bg-white/40 hover:bg-white/60 text-blue-900 px-6 py-3 rounded-full text-sm font-bold transition-transform transform hover:scale-105 border border-white/70"
-                >
-                  Se connecter
-                </Link>
-              </div>
-            )}
+            
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link
+                href="/register"
+                className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-full text-sm font-bold transition-transform transform hover:scale-105 shadow-lg"
+              >
+                Créer un compte
+              </Link>
+              <Link
+                href="/login"
+                className="bg-white/40 hover:bg-white/60 text-blue-900 px-6 py-3 rounded-full text-sm font-bold transition-transform transform hover:scale-105 border border-white/70"
+              >
+                Se connecter
+              </Link>
+            </div>
           </div>
         </main>
       </div>
