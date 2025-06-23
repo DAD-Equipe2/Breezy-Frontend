@@ -3,6 +3,7 @@ import { useContext } from "react";
 import { usePathname } from "next/navigation";
 import { AuthContext } from "../context/AuthContext";
 import SearchBar from "./SearchBar";
+import ThemeToggle from "./ThemeToggle";
 
 const Navbar = () => {
   const { user, logout } = useContext(AuthContext);
@@ -10,12 +11,12 @@ const Navbar = () => {
   const isOnFeed = pathname === "/feed" || pathname.startsWith("/profile");
 
   return (
-    <nav className="fixed top-0 left-0 right-0 bg-transparent backdrop-blur-md p-4 flex items-center justify-between z-30">
+    <nav className="fixed top-0 left-0 right-0 bg-background bg-opacity-50 backdrop-blur-md p-4 flex items-center justify-between z-30 text-foreground">
       {/* Logo */}
       <div className="flex-shrink-0 flex items-center">
         <Link href="/" className="flex items-center text-blue-500 font-bold">
           <img src="/logo-breezy.png" alt="Breezy Logo" className="h-8 w-8 object-contain" />
-          <span>Breezy</span>
+          <span className="ml-2">Breezy</span>
         </Link>
       </div>
 
@@ -28,8 +29,9 @@ const Navbar = () => {
         </div>
       )}
 
-      {/* Liens */}
+      {/* Liens + Thème */}
       <div className="flex items-center space-x-4 flex-shrink-0">
+        <ThemeToggle />
         {user ? (
           <>
             <Link href={`/profile/${user._id}`} className="text-blue-500 font-bold hover:underline">

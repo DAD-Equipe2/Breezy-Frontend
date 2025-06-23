@@ -1,5 +1,6 @@
 import "../styles/globals.css";
 import { AuthProvider } from "../src/context/AuthContext";
+import { ThemeProvider } from 'next-themes';
 import Head from "next/head";
 
 function MyApp({ Component, pageProps }) {
@@ -7,11 +8,13 @@ function MyApp({ Component, pageProps }) {
     <>
       <Head>
         <link rel="icon" href="/logo-breezy.png" />
-        <title>Breezy</title> {/* Tu peux aussi modifier le titre ici */}
+        <title>Breezy</title>
       </Head>
-      <AuthProvider>
-        <Component {...pageProps} />
-      </AuthProvider>
+      <ThemeProvider attribute="class">
+        <AuthProvider>
+          <Component {...pageProps} />
+        </AuthProvider>
+      </ThemeProvider>
     </>
   );
 }
