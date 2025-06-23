@@ -363,6 +363,8 @@ export default function PostCard({ post, isOwn }) {
           newComment={newComment}
           setNewComment={setNewComment}
           onSubmit={handleCommentSubmit}
+          postId={post._id}
+          setComments={setComments}
         />
       )}
     </div>

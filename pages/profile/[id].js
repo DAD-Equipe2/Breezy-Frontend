@@ -19,7 +19,7 @@ export default function ProfilePage() {
   const [error, setError] = useState(null);
 
   const [isEditing, setIsEditing] = useState(false);
-  const [editForm, setEditForm] = useState({ bio: "", avatarURL: "" });
+  const [editForm, setEditForm] = useState({ username: "", bio: "", avatarURL: "" });
   const [selectedFile, setSelectedFile] = useState(null);
 
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -37,7 +37,7 @@ export default function ProfilePage() {
       try {
         const { user, posts } = await getProfile(id);
         setProfileData({ user, posts });
-        setEditForm({ bio: user.bio || "", avatarURL: user.avatarURL || "" });
+        setEditForm({ username: user.username || "", bio: user.bio || "", avatarURL: user.avatarURL || "" });
       } catch (err) {
         setError(err.response?.data?.message || "Erreur de chargement");
       } finally {
@@ -51,6 +51,9 @@ export default function ProfilePage() {
 
   const handleEditSubmit = async (e) => {
     e.preventDefault();
+    if (!editForm.username.trim()) {
+        return alert("Le nom de profil ne peut pas être vide.");
+      }
     try {
       let avatarURL = editForm.avatarURL;
       if (selectedFile) {
@@ -76,7 +79,8 @@ export default function ProfilePage() {
           return alert(json.message);
         }
       }
-      const updatedUser = await updateProfile({ bio: editForm.bio, avatarURL });
+      
+      const updatedUser = await updateProfile({ username: editForm.username.trim(), bio: editForm.bio, avatarURL });
       setProfileData(prev => ({ ...prev, user: updatedUser }));
       setIsEditing(false);
       setSelectedFile(null);
@@ -107,9 +111,7 @@ export default function ProfilePage() {
       <div className="fixed inset-0 z-0 animate-bg-pan bg-gradient-to-r from-sky-300 via-blue-300 to-indigo-300 bg-[length:300%_300%]"></div>
       <Navbar />
       <div className="relative max-w-2xl mx-auto mt-8 p-4 min-h-screen pt-20 z-10">
-        {/* bloc profil */}
         <div className="relative bg-gradient-to-r from-blue-400 via-sky-300 to-indigo-400 rounded-3xl shadow-lg p-6 flex flex-col sm:flex-row items-center gap-6 mb-6 border border-blue-200/60">
-          {/* Boutons */}
           {isOwn && (
             <div className="absolute top-4 right-4 flex gap-2 z-10">
               <EditButton onClick={() => setIsEditing(true)} title="Modifier le profil" />
@@ -154,10 +156,8 @@ export default function ProfilePage() {
               </div>
             )}
           </div>
-          {/* Plus de boutons ici, ils sont en haut à droite */}
           {!isOwn && currentUser && (
             <div className="sm:ml-auto mt-4 sm:mt-0 flex flex-col items-center gap-2">
-              {/* Les boutons d'action sont désormais en haut à droite, on retire ici */}
               {!isOwn && currentUser && <FollowButton targetUserId={user._id} />}
             </div>
           )}
@@ -165,14 +165,12 @@ export default function ProfilePage() {
         {isOwn && isEditing && (
           <>
             <div className="fixed inset-0 bg-black/30 backdrop-blur-sm z-40 flex items-center justify-center"></div>
-            {/* Modal modif */}
             <div className="fixed inset-0 z-50 flex items-center justify-center">
               <div className="w-full max-w-md mx-auto">
                 <form
                   onSubmit={handleEditSubmit}
                   className="relative bg-white rounded-2xl shadow-2xl p-8 space-y-5 border border-blue-200/60"
                 >
-                  {/* Croix */}
                   <button
                     type="button"
                     className="absolute top-3 right-3 text-gray-400 hover:text-red-500 text-2xl font-bold focus:outline-none"
@@ -182,9 +180,25 @@ export default function ProfilePage() {
                     }}
                     aria-label="Fermer"
                   >
-                    ×
                   </button>
                   <h2 className="text-lg font-bold text-gray-900 text-center">Éditer votre profil</h2>
+                  <div>
+                    <label className="block font-medium text-gray-700">
+                      Nom de profil :
+                    </label>
+                    <input
+                      type="text"
+                      name="username"
+                      value={editForm.username}
+                      onChange={handleEditChange}
+                      maxLength={30}
+                      required
+                      className="w-full border px-2 py-1 rounded"
+                    />
+                    <small className="text-gray-600">
+                      {editForm.username.length}/30
+                    </small>
+                  </div>
                   <div>
                     <label className="block font-medium text-gray-700">Bio :</label>
                     <textarea
@@ -192,7 +206,9 @@ export default function ProfilePage() {
                       value={editForm.bio}
                       onChange={handleEditChange}
                       className="w-full border px-2 py-1 rounded"
+                      maxLength={100}
                     />
+                  <small>{editForm.bio.length}/100</small>
                   </div>
                   <div>
                     <div className="flex flex-col items-center">

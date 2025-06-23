@@ -17,10 +17,14 @@ const Navbar = () => {
   return (
     <nav className="fixed top-0 left-0 right-0 bg-background bg-opacity-50 backdrop-blur-md p-4 flex flex-col md:flex-row md:items-center md:justify-between z-30 text-foreground">
       {/* Logo */}
-      <div className="flex-shrink-0 flex items-center">
-        <Link href="/" className="flex items-center text-blue-500 font-bold">
-          <img src="/logo-breezy.png" alt="Breezy Logo" className="h-8 w-8 object-contain" />
-          <span className="ml-2">Breezy</span>
+      <div className="flex-shrink-0 flex items-center justify-between w-full md:w-auto">
+        <Link href="/" className="flex items-center text-blue-500 font-bold text-2xl">
+          <img
+            src="/logo-breezy.png"
+            alt="Breezy Logo"
+            className="h-8 w-8 object-contain mr-1"
+          />
+          <span>Breezy</span>
         </Link>
       </div>
 
@@ -38,10 +42,16 @@ const Navbar = () => {
         <ThemeToggle />
         {user ? (
           <>
-            <Link href={`/profile/${user._id}`} className="text-blue-500 font-bold hover:underline">
+            <Link
+              href={`/profile/${user._id}`}
+              className="text-blue-500 font-bold hover:underline"
+            >
               Profil
             </Link>
-            <button onClick={logout} className="text-red-500 font-bold hover:underline">
+            <button
+              onClick={logout}
+              className="text-red-500 font-bold hover:underline"
+            >
               Déconnexion
             </button>
           </>

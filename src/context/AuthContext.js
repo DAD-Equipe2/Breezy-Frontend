@@ -1,9 +1,11 @@
 import { createContext, useState, useEffect } from "react";
 import axios from "axios";
+import { useRouter } from "next/router";
 
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
+  const router = useRouter();
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -51,12 +53,17 @@ export const AuthProvider = ({ children }) => {
       .catch(() => {});
   };
 
-  const logout = () => {
+  const logout = async () => {
+    try {
+      axios.post(`${process.env.NEXT_PUBLIC_API_URL}/auth/logout`,
+        {}, 
+        { withCredentials: true});
+    } catch (error) { }
     localStorage.removeItem("breezyToken");
     delete axios.defaults.headers.common["Authorization"];
     setUser(null);
     setToken(null);
-    window.location.href = "/";
+    router.replace("/")
   };
 
   if (loading) {

@@ -7,8 +7,8 @@ export const getProfile = async (id) => {
   return res.data.data;
 };
 
-export const updateProfile = async ({ bio, avatarURL }) => {
-  const res = await axios.put(`${API_BASE}/users/profile`, { bio, avatarURL });
+export const updateProfile = async ({ username, bio, avatarURL }) => {
+  const res = await axios.put(`${API_BASE}/users/profile`, { username, bio, avatarURL });
   return res.data.data;
 };
 
