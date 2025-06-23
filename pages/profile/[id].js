@@ -1,3 +1,5 @@
+'use client';
+
 import { useEffect, useState, useContext } from "react";
 import { useRouter } from "next/router";
 
@@ -12,19 +14,17 @@ import { getProfile, updateProfile, deleteProfile } from "../../src/services/use
 export default function ProfilePage() {
   const router = useRouter();
   const { id } = router.query;
-  const { user: currentUser } = useContext(AuthContext);
+  const { user: currentUser, logout } = useContext(AuthContext);
 
   const [profileData, setProfileData] = useState({ user: null, posts: [] });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   const [isEditing, setIsEditing] = useState(false);
-  const [editForm, setEditForm] = useState({ username: "", bio: "", avatarURL: "" });
+  const [editForm, setEditForm] = useState({ bio: "", avatarURL: "" });
   const [selectedFile, setSelectedFile] = useState(null);
 
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const { logout } = useContext(AuthContext)
-
 
   useEffect(() => {
     if (!router.isReady) return;
@@ -37,7 +37,7 @@ export default function ProfilePage() {
       try {
         const { user, posts } = await getProfile(id);
         setProfileData({ user, posts });
-        setEditForm({ username: user.username || "", bio: user.bio || "", avatarURL: user.avatarURL || "" });
+        setEditForm({ bio: user.bio || "", avatarURL: user.avatarURL || "" });
       } catch (err) {
         setError(err.response?.data?.message || "Erreur de chargement");
       } finally {
@@ -51,9 +51,6 @@ export default function ProfilePage() {
 
   const handleEditSubmit = async (e) => {
     e.preventDefault();
-    if (!editForm.username.trim()) {
-        return alert("Le nom de profil ne peut pas être vide.");
-      }
     try {
       let avatarURL = editForm.avatarURL;
       if (selectedFile) {
@@ -79,8 +76,8 @@ export default function ProfilePage() {
           return alert(json.message);
         }
       }
-      
-      const updatedUser = await updateProfile({ username: editForm.username.trim(), bio: editForm.bio, avatarURL });
+
+      const updatedUser = await updateProfile({ bio: editForm.bio, avatarURL });
       setProfileData(prev => ({ ...prev, user: updatedUser }));
       setIsEditing(false);
       setSelectedFile(null);
@@ -98,24 +95,22 @@ export default function ProfilePage() {
     } catch (err) {
       alert(err.response?.data?.message || err.message);
     }
-  }
+  };
 
-  if (loading) return <div>Chargement…</div>;
+  if (loading) return <div className="text-foreground">Chargement…</div>;
   if (error) return <div className="text-red-600">{error}</div>;
 
   const { user, posts } = profileData;
   const isOwn = currentUser && currentUser._id === user._id;
-
   return (
     <>
-      <div className="fixed inset-0 z-0 animate-bg-pan bg-gradient-to-r from-sky-300 via-blue-300 to-indigo-300 bg-[length:300%_300%]"></div>
+      <div className="fixed inset-0 z-0 animate-bg-pan bg-[linear-gradient(var(--grad-angle),var(--grad-from),var(--grad-to))] bg-[length:300%_300%]"></div>
       <Navbar />
-      <div className="relative max-w-2xl mx-auto mt-8 p-4 min-h-screen pt-20 z-10">
-        <div className="relative bg-gradient-to-r from-blue-400 via-sky-300 to-indigo-400 rounded-3xl shadow-lg p-6 flex flex-col sm:flex-row items-center gap-6 mb-6 border border-blue-200/60">
+      <div className="relative max-w-2xl mx-auto mt-8 p-4 min-h-screen pt-20 z-10 text-foreground">
+        <div className="relative bg-white/80 dark:bg-black/30 rounded-3xl shadow-lg p-6 flex flex-col sm:flex-row items-center gap-6 mb-6 border border-white/50 dark:border-white/20">
           {isOwn && (
             <div className="absolute top-4 right-4 flex gap-2 z-10">
               <EditButton onClick={() => setIsEditing(true)} title="Modifier le profil" />
-              
               <button
                 className="w-10 h-10 flex items-center justify-center rounded-full bg-red-400 hover:bg-red-500 text-white text-xl shadow transition group"
                 onClick={() => setShowDeleteModal(true)}
@@ -129,39 +124,32 @@ export default function ProfilePage() {
           )}
           <div className="relative flex-shrink-0">
             <img
-              src={
-                user.avatarURL
-                  ? `${process.env.NEXT_PUBLIC_API_URL}${user.avatarURL}`
-                  : "/default-avatar.png"
-              }
+              src={user.avatarURL ? `${process.env.NEXT_PUBLIC_API_URL}${user.avatarURL}` : "/default-avatar.png"}
               alt="Avatar"
               className="w-28 h-28 sm:w-32 sm:h-32 rounded-full object-cover border-4 border-white shadow-xl bg-white"
             />
           </div>
           <div className="flex-1 flex flex-col items-center sm:items-start min-w-0">
-            <h1 className="text-3xl font-extrabold text-gray-900 mb-1 flex items-center gap-2">
+            <h1 className="text-3xl font-extrabold text-white dark:text-gray-100 mb-1 flex items-center gap-2">
               {user.username}
               {user.isVerified && (
-                <span className="inline-block align-middle text-blue-500" title="Compte vérifié">✔️</span>
+                <span className="inline-block align-middle text-blue-500">✔️</span>
               )}
             </h1>
-            <p className="text-sm text-gray-600 mb-2">
+            <p className="text-sm text-gray-200 mb-2">
               Inscrit le {new Date(user.createdAt).toLocaleDateString()}
             </p>
             {user.bio && (
-              <div className="bg-white/80 border border-blue-200/60 rounded-xl px-4 py-3 shadow-inner w-full max-w-xl mt-2 overflow-x-auto" style={{maxWidth: '400px'}}>
-                <p className="text-gray-800 whitespace-pre-line break-words text-base leading-relaxed max-w-full">
+              <div className="bg-white/80 dark:bg-black/40 border border-blue-200/60 dark:border-white/20 rounded-xl px-4 py-3 shadow-inner w-full max-w-xl mt-2 overflow-x-auto">
+                <p className="text-gray-900 dark:text-white whitespace-pre-line break-words text-base leading-relaxed max-w-full">
                   {user.bio}
                 </p>
               </div>
             )}
           </div>
-          {!isOwn && currentUser && (
-            <div className="sm:ml-auto mt-4 sm:mt-0 flex flex-col items-center gap-2">
-              {!isOwn && currentUser && <FollowButton targetUserId={user._id} />}
-            </div>
-          )}
+          {!isOwn && currentUser && <FollowButton targetUserId={user._id} />}
         </div>
+
         {isOwn && isEditing && (
           <>
             <div className="fixed inset-0 bg-black/30 backdrop-blur-sm z-40 flex items-center justify-center"></div>
@@ -169,7 +157,7 @@ export default function ProfilePage() {
               <div className="w-full max-w-md mx-auto">
                 <form
                   onSubmit={handleEditSubmit}
-                  className="relative bg-white rounded-2xl shadow-2xl p-8 space-y-5 border border-blue-200/60"
+                  className="relative bg-white dark:bg-black border border-white/50 dark:border-white/20 rounded-2xl shadow-2xl p-8 space-y-5"
                 >
                   <button
                     type="button"
@@ -180,35 +168,17 @@ export default function ProfilePage() {
                     }}
                     aria-label="Fermer"
                   >
+                    ×
                   </button>
-                  <h2 className="text-lg font-bold text-gray-900 text-center">Éditer votre profil</h2>
+                  <h2 className="text-lg font-bold text-center text-foreground">Éditer votre profil</h2>
                   <div>
-                    <label className="block font-medium text-gray-700">
-                      Nom de profil :
-                    </label>
-                    <input
-                      type="text"
-                      name="username"
-                      value={editForm.username}
-                      onChange={handleEditChange}
-                      maxLength={30}
-                      required
-                      className="w-full border px-2 py-1 rounded"
-                    />
-                    <small className="text-gray-600">
-                      {editForm.username.length}/30
-                    </small>
-                  </div>
-                  <div>
-                    <label className="block font-medium text-gray-700">Bio :</label>
+                    <label className="block font-medium text-foreground">Bio :</label>
                     <textarea
                       name="bio"
                       value={editForm.bio}
                       onChange={handleEditChange}
-                      className="w-full border px-2 py-1 rounded"
-                      maxLength={100}
+                      className="w-full border px-2 py-1 rounded bg-white/80 dark:bg-white/10 text-foreground"
                     />
-                  <small>{editForm.bio.length}/100</small>
                   </div>
                   <div>
                     <div className="flex flex-col items-center">
@@ -221,22 +191,11 @@ export default function ProfilePage() {
                     </div>
                   </div>
                   <div className="flex space-x-2 justify-center">
-                    <button
-                      type="submit"
-                      className="px-4 py-2 bg-green-500 text-white rounded"
-                    >
-                      Sauvegarder
-                    </button>
-                    <button
-                      type="button"
-                      className="px-4 py-2 bg-gray-300 rounded"
-                      onClick={() => {
-                        setIsEditing(false);
-                        setSelectedFile(null);
-                      }}
-                    >
-                      Annuler
-                    </button>
+                    <button type="submit" className="px-4 py-2 bg-green-500 text-white rounded">Sauvegarder</button>
+                    <button type="button" className="px-4 py-2 bg-gray-300 dark:bg-gray-700 dark:text-white rounded" onClick={() => {
+                      setIsEditing(false);
+                      setSelectedFile(null);
+                    }}>Annuler</button>
                   </div>
                 </form>
               </div>
@@ -244,26 +203,24 @@ export default function ProfilePage() {
           </>
         )}
 
-        <hr className="my-6" />
-        <h2 className="text-xl font-semibold mb-4">
-          Publications de {user.username}
-        </h2>
+        <hr className="my-6 border-white/50 dark:border-white/20" />
+        <h2 className="text-xl font-semibold text-foreground mb-4">Publications de {user.username}</h2>
         {posts.length === 0 ? (
-          <p>Aucun post pour le moment.</p>
+          <p className="text-foreground">Aucun post pour le moment.</p>
         ) : (
           posts.map((post) => <PostCard key={post._id} post={post} isOwn={isOwn} />)
         )}
 
         {showDeleteModal && (
           <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
-            <div className="bg-white rounded shadow-lg p-6 max-w-sm w-full">
+            <div className="bg-white dark:bg-black text-foreground rounded shadow-lg p-6 max-w-sm w-full">
               <h2 className="text-lg font-bold mb-2">Supprimer le profil</h2>
-              <p className="mb-4 text-gray-700">
+              <p className="mb-4">
                 Êtes-vous sûr de vouloir supprimer votre compte ? Cette action est <span className="font-semibold text-red-600">irréversible</span>.
               </p>
               <div className="flex justify-end gap-2">
                 <button
-                  className="px-4 py-2 bg-gray-300 rounded"
+                  className="px-4 py-2 bg-gray-300 dark:bg-gray-700 dark:text-white rounded"
                   onClick={() => setShowDeleteModal(false)}
                 >
                   Annuler
@@ -278,7 +235,6 @@ export default function ProfilePage() {
             </div>
           </div>
         )}
-
       </div>
     </>
   );

@@ -1,3 +1,5 @@
+'use client';
+
 import { useEffect, useState, useContext } from "react";
 import { useRouter } from "next/router";
 
@@ -48,9 +50,7 @@ export default function FeedPage() {
       const isImage = mediaFile.type.startsWith("image/");
       const max = isImage ? 5 * 1024 * 1024 : 50 * 1024 * 1024;
       if (mediaFile.size > max) {
-        setError(
-          `Le fichier dépasse la limite de ${isImage ? "5" : "50"} Mo`
-        );
+        setError(`Le fichier dépasse la limite de ${isImage ? "5" : "50"} Mo`);
         return;
       }
     }
@@ -75,10 +75,10 @@ export default function FeedPage() {
 
   return (
     <>
-      <div className="fixed inset-0 z-0 animate-bg-pan bg-gradient-to-r from-sky-300 via-blue-300 to-indigo-300 bg-[length:300%_300%]"></div>
+      <div className="fixed inset-0 z-0 animate-bg-pan bg-[linear-gradient(var(--grad-angle),var(--grad-from),var(--grad-to))] bg-[length:300%_300%]"></div>
       <Navbar />
-      <div className="relative max-w-2xl mx-auto mt-8 p-4 min-h-screen pt-20 z-10">
-        <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-2xl border border-blue-200/60 p-6 mb-8 transition-all duration-200 hover:shadow-[0_8px_40px_rgba(59,130,246,0.15)]">
+      <div className="relative max-w-2xl mx-auto mt-8 p-4 min-h-screen pt-20 z-10 text-foreground">
+        <div className="bg-white/80 dark:bg-black/30 backdrop-blur-md rounded-2xl shadow-2xl border border-blue-200/60 dark:border-white/20 p-6 mb-8 transition-all duration-200 hover:shadow-[0_8px_40px_rgba(59,130,246,0.15)]">
           <form onSubmit={handlePostSubmit} className="mb-0">
             {error && (
               <div className="text-red-500 text-sm mb-2">{error}</div>
@@ -92,9 +92,9 @@ export default function FeedPage() {
               }}
               rows={3}
               maxLength={MAX_LEN}
-              className="bg-gray-100 shadow-inner rounded-xl p-4 w-full border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-400 transition-transform duration-200 hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)]"
+              className="bg-gray-100 dark:bg-white/10 text-black dark:text-white placeholder-gray-400 dark:placeholder-white/70 shadow-inner rounded-xl p-4 w-full border border-gray-200 dark:border-white/20 focus:outline-none focus:ring-2 focus:ring-blue-400 transition-transform duration-200 hover:shadow-[0_8px_30px_rgba(0,0,0,0.12)]"
             />
-            <div className="text-right text-xs text-gray-600 mb-2">
+            <div className="text-right text-xs text-gray-600 dark:text-gray-400 mb-2">
               {newPostContent.length}/{MAX_LEN}
             </div>
             <input
@@ -102,25 +102,22 @@ export default function FeedPage() {
               placeholder="Tags (séparés par des virgules)"
               value={tagsInput}
               onChange={(e) => setTagsInput(e.target.value)}
-              className="bg-blue-200 text-blue-600 placeholder-white shadow-xl rounded-xl p-4 w-full border border-white/40 focus:outline-none focus:ring-2 focus:ring-blue-400 ..."
+              className="bg-blue-200 dark:bg-blue-900 text-blue-600 dark:text-blue-300 placeholder-white dark:placeholder-white/60 shadow-xl rounded-xl p-4 w-full border border-white/40 dark:border-white/20 focus:outline-none focus:ring-2 focus:ring-blue-400"
               style={{ height: "56px" }}
             />
             <div className="h-4" />
             <div className="flex items-center justify-center gap-4 mb-2">
               <div className="flex flex-col items-center">
                 <ImageUploadButton onChange={(e) => setMediaFile(e.target.files[0])} />
-                <span className="text-xs font-semibold text-blue-700 mt-2">Ajouter une image</span>
+                <span className="text-xs font-semibold text-blue-700 dark:text-blue-300 mt-2">Ajouter une image</span>
               </div>
               {mediaFile && (
-                <span className="text-xs text-gray-600">{mediaFile.name}</span>
+                <span className="text-xs text-gray-600 dark:text-gray-300">{mediaFile.name}</span>
               )}
               <button
                 type="submit"
-                disabled={
-                  !newPostContent.trim() ||
-                  newPostContent.length > MAX_LEN
-                }
-                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:opacity-50 ml-2"
+                disabled={!newPostContent.trim() || newPostContent.length > MAX_LEN}
+                className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded hover:bg-blue-600 disabled:opacity-50 ml-2"
               >
                 Publier
               </button>

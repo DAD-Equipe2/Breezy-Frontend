@@ -3,26 +3,22 @@
 @tailwind utilities;
 
 :root {
-  --grad-from: #8b5cf6; /* violet clair */
-  --grad-to: #ec4899;   /* rose clair */
+  --grad-from: #8ec5ff;
+  --grad-to: #a3b3ff;
   --grad-angle: to right;
-
   --background: #ffffff;
   --foreground: #000000;
-
   --surface: #f9fafb;
   --accent: #3b82f6;
   --text-muted: #6b7280;
 }
 
 .dark {
-  --grad-from: #0a0f1c;
-  --grad-to: #1f2937;
+  --grad-from: #162456;
+  --grad-to: #1e1a4d;
   --grad-angle: to left;
-
   --background: #0a0f1c;
   --foreground: #f8fafc;
-
   --surface: #111827;
   --accent: #60a5fa;
   --text-muted: #94a3b8;

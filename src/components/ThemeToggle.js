@@ -12,9 +12,9 @@ export default function ThemeToggle() {
   return (
     <button
       onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-      className="p-2 rounded text-sm border border-foreground dark:border-background"
+      className=""
     >
-      {theme === "dark" ? "☀️ Thème clair" : "🌙 Thème sombre"}
+      {theme === "dark" ? "☀️" : "🌙"}
     </button>
   );
 }
