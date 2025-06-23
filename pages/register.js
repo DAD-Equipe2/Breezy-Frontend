@@ -54,7 +54,8 @@ export default function Register() {
             method: "POST",
             body: data,
             headers,
-          }
+          },
+          { credentials: "include" }
         );
 
         const json = await res.json();

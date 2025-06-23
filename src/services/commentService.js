@@ -6,10 +6,10 @@ export const addComment = async (postId, content) => {
   return res.data;
 };
 
-export const replyToComment = async (postId, parentCommentId, content) => {
+export const replyToComment = async (postId, parentId, content) => {
   const res = await axios.post(`${API_URL}/comments/reply`, {
     postId,
-    parentCommentId,
+    parentId,
     content,
   });
   return res.data;
@@ -19,3 +19,8 @@ export const getComments = async (postId) => {
   const res = await axios.get(`${API_URL}/comments/post/${postId}`);
   return res.data;
 };
+
+export const deleteComment = async (commentId) => {
+  const res = await axios.delete(`${API_URL}/comments/${commentId}`);
+  return res.data;
+}
