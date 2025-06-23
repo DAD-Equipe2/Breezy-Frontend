@@ -1,0 +1,73 @@
+import { useContext, useEffect, useState } from "react";
+import Link from "next/link";
+import { AuthContext } from "../context/AuthContext";
+
+export default function RightSidebar() {
+  const { user } = useContext(AuthContext);
+  const [followers, setFollowers] = useState([]);
+
+  useEffect(() => {
+    if (!user) return;
+    (async () => {
+      try {
+        const token = localStorage.getItem("breezyToken");
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/follow/followers/${user._id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        const json = await res.json();
+        console.log("DEBUG followers API response:", json); // <-- debug
+        if (json.success && Array.isArray(json.data)) {
+          setFollowers(json.data.slice(0, 10));
+        } else {
+          setFollowers([]);
+        }
+      } catch (e) {
+        setFollowers([]);
+      }
+    })();
+  }, [user]);
+
+  return (
+    <aside className="hidden md:flex flex-col items-center fixed right-0 top-0 h-screen w-1/4 max-w-xs p-6 z-20">
+      <div className="bg-white/80 dark:bg-blue-950/80 rounded-2xl shadow-xl border border-blue-200/60 dark:border-blue-900/60 w-full p-6 mt-24">
+        <h2 className="text-lg font-bold text-blue-700 dark:text-blue-300 mb-4">
+          Followers
+        </h2>
+        {followers.length === 0 ? (
+          <p className="text-gray-500 dark:text-gray-300 text-sm">
+            Aucun abonné à afficher.
+          </p>
+        ) : (
+          <ul className="space-y-3">
+            {followers.map((f) => (
+              <li key={f._id} className="flex items-center gap-3">
+                <Link
+                  href={`/profile/${f._id}`}
+                  className="flex items-center gap-2 hover:underline"
+                >
+                  <img
+                    src={
+                      f.avatarURL
+                        ? `${process.env.NEXT_PUBLIC_API_URL}${f.avatarURL}`
+                        : "/default-avatar.png"
+                    }
+                    alt={f.username}
+                    className="w-8 h-8 rounded-full object-cover border border-blue-200 dark:border-blue-900 bg-white dark:bg-blue-900"
+                  />
+                  <span className="font-medium text-gray-800 dark:text-gray-100">
+                    {f.username}
+                  </span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+    </aside>
+  );
+}
