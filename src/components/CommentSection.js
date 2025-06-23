@@ -86,7 +86,11 @@ const CommentSection = ({
             }
             className="w-full border px-2 py-1 rounded"
             rows={2}
+            maxLength={280}
           ></textarea>
+          <div className="text-right text-xs text-gray-600 mb-2">
+              {newComment.length}/280
+            </div>
           <button
             type="submit"
             className="mt-2 px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"

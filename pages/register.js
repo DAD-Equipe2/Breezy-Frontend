@@ -43,7 +43,6 @@ export default function Register() {
         if (avatarFile) {
           data.append("avatar", avatarFile);
         } else {
-          // Ajoute une URL d'avatar par défaut si aucun fichier n'est choisi
           data.append("avatarUrl", "/default-avatar.png");
         }
 
@@ -71,13 +70,8 @@ export default function Register() {
 
   return (
     <div className="relative min-h-screen overflow-hidden flex flex-col">
-      {/* Fond animé */}
       <div className="absolute inset-0 z-0 animate-bg-pan bg-gradient-to-r from-sky-300 via-blue-300 to-indigo-300 bg-[length:300%_300%]"></div>
-
-      {/* Navbar fixée */}
       <Navbar />
-
-      {/* Formulaire */}
       <main className="relative z-10 flex items-center justify-center px-4 min-h-screen pt-20">
         <motion.form
           onSubmit={handleSubmit}
@@ -100,8 +94,10 @@ export default function Register() {
             required
             value={formData.username}
             onChange={handleChange}
+            maxLength={30}
             className="w-full p-3 rounded-xl bg-white/20 text-white placeholder-white/80 focus:outline-none focus:ring-2 focus:ring-blue-400"
           />
+          <small>{formData.username.length}/30</small>
 
           <input
             type="email"
@@ -128,8 +124,10 @@ export default function Register() {
             placeholder="Bio (optionnelle)"
             value={formData.bio}
             onChange={handleChange}
+            maxLength={100}
             className="w-full p-3 rounded-xl bg-white/20 text-white placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none"
           />
+          <small>{formData.bio.length}/100</small>
 
           <div className="flex items-center justify-center gap-4">
             <div className="flex flex-col items-center">

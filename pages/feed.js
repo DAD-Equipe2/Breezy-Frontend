@@ -78,7 +78,6 @@ export default function FeedPage() {
       <div className="fixed inset-0 z-0 animate-bg-pan bg-gradient-to-r from-sky-300 via-blue-300 to-indigo-300 bg-[length:300%_300%]"></div>
       <Navbar />
       <div className="relative max-w-2xl mx-auto mt-8 p-4 min-h-screen pt-20 z-10">
-        {/* Encadrement */}
         <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-2xl border border-blue-200/60 p-6 mb-8 transition-all duration-200 hover:shadow-[0_8px_40px_rgba(59,130,246,0.15)]">
           <form onSubmit={handlePostSubmit} className="mb-0">
             {error && (
@@ -128,7 +127,6 @@ export default function FeedPage() {
             </div>
           </form>
         </div>
-        {/* posts */}
         {loading ? (
           <div>Chargement du feed…</div>
         ) : posts.length === 0 ? (
