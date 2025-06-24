@@ -25,6 +25,16 @@ export default function ProfilePage() {
   const [selectedFile, setSelectedFile] = useState(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
+  const refreshProfile = async () => {
+    if (!id) return;
+    try {
+      const { user, posts } = await getProfile(id);
+      setProfileData({ user, posts });
+    } catch (err) {
+      setError(err.response?.data?.message || "Erreur de rafraîchissement");
+    }
+  };
+
   useEffect(() => {
     if (!router.isReady) return;
     if (!id) {
@@ -128,7 +138,6 @@ export default function ProfilePage() {
                 title="Compte certifié"
                 aria-label="Compte certifié"
               >
-                {/* Icône certif Instagram style */}
                 <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <circle cx="11" cy="11" r="10" fill="#3897f0" stroke="#fff" strokeWidth="2"/>
                   <path d="M7.5 11.5l2.2 2.2 4-4" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
@@ -137,7 +146,6 @@ export default function ProfilePage() {
             )}
           </h1>
 
-          {/* Stats */}
           <div className="flex justify-center space-x-6 text-sm text-gray-700 dark:text-gray-200 font-medium">
             <div>
               <span className="block text-lg font-bold text-black dark:text-white">{user.followers?.length || 0}</span>
@@ -148,11 +156,9 @@ export default function ProfilePage() {
               Abonnements
             </div>
           </div>
-          {/* Divider */}
           <div className="w-full flex items-center justify-center">
             <div className="w-1/2 h-px bg-gray-200 dark:bg-gray-700 rounded"></div>
           </div>
-          {/* Bio */}
           {user.bio && (
             <div className="text-gray-800 dark:text-gray-200 max-w-lg text-sm leading-relaxed mt-2 w-full flex flex-col items-start px-0">
               <h2 className="font-semibold text-left w-full mb-1 px-4">Bio</h2>
@@ -174,12 +180,11 @@ export default function ProfilePage() {
             </div>
           ) : (
             <div className="mt-4">
-              <FollowButton targetUserId={user._id} />
+              <FollowButton targetUserId={user._id} onFollowChange={refreshProfile} />
             </div>
           )}
         </div>
 
-        {/* Modal edit */}
         {isOwn && isEditing && (
           <>
             <div className="fixed inset-0 bg-black/30 dark:bg-black/70 backdrop-blur-sm z-40 flex items-center justify-center"></div>

@@ -2,7 +2,7 @@ import { useState, useEffect, useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
 import { followUser, unfollowUser } from "../services/followService";
 
-const FollowButton = ({ targetUserId }) => {
+const FollowButton = ({ targetUserId, onFollowChange }) => {
   const { user: currentUser } = useContext(AuthContext);
   const [isFollowing, setIsFollowing] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -18,12 +18,15 @@ const FollowButton = ({ targetUserId }) => {
           }
         );
         const data = await res.json();
-        if (data.success) {
-          const ids = data.data.map((u) => u._id);
-          setIsFollowing(ids.includes(targetUserId));
+        if (data.success && Array.isArray(data.data)) {
+          const ids = data.data.map((u) => String(u._id || u.id));
+          setIsFollowing(ids.includes(String(targetUserId)));
+        } else {
+          setIsFollowing(false);
         }
       } catch (err) {
         console.error("Erreur checkFollow :", err);
+        setIsFollowing(false);
       }
     };
     checkFollow();
@@ -40,6 +43,7 @@ const FollowButton = ({ targetUserId }) => {
         await followUser(targetUserId);
         setIsFollowing(true);
       }
+      if (onFollowChange) onFollowChange();
     } catch (err) {
       console.error("Erreur follow/unfollow :", err);
     } finally {
