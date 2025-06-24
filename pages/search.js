@@ -13,6 +13,7 @@ export default function SearchPage() {
   const [postResults, setPostResults] = useState([]);
   const [userResults, setUserResults] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [visibleUsers, setVisibleUsers] = useState(5);
 
   useEffect(() => {
     if (!query) return;
@@ -21,9 +22,14 @@ export default function SearchPage() {
       .then(([users, posts]) => {
         setUserResults(users);
         setPostResults(posts);
+        setVisibleUsers(5);
       })
       .finally(() => setLoading(false));
   }, [query]);
+
+  const handleShowMore = () => {
+    setVisibleUsers((prev) => prev + 5);
+  };
 
   return (
     <div className="relative min-h-screen overflow-hidden text-foreground">
@@ -41,21 +47,51 @@ export default function SearchPage() {
                 {userResults.length === 0 ? (
                   <p>Aucun profil trouvé.</p>
                 ) : (
-                  <ul>
-                    {userResults.map((user) => (
-                      <li key={user._id} className="mb-2 flex items-center gap-2">
-                        <a
-                          href={`/profile/${user._id}`}
-                          className="text-blue-600 dark:text-blue-300 hover:underline font-semibold"
+                  <>
+                    <ul className="space-y-4">
+                      {userResults.slice(0, visibleUsers).map((user) => (
+                        <li
+                          key={user._id}
+                          className="flex items-center gap-4 p-4 rounded-lg bg-white dark:bg-gray-800 shadow border border-gray-200 dark:border-gray-700"
                         >
-                          {user.username}
-                        </a>
-                        <span className="text-xs text-gray-500 dark:text-gray-400">
-                          {user.followersCount} followers · {user.followingCount} abonnements
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
+                          <img
+                            src={user.avatarUrl || "/default-avatar.png"}
+                            alt={user.username}
+                            className="w-14 h-14 rounded-full object-cover border border-gray-300 dark:border-gray-600"
+                          />
+                          <div className="flex-1">
+                            <a
+                              href={`/profile/${user._id}`}
+                              className="text-lg font-semibold text-blue-600 dark:text-blue-300 hover:underline"
+                            >
+                              {user.username}
+                            </a>
+                            <div className="flex flex-wrap gap-4 mt-1 text-sm text-gray-600 dark:text-gray-300">
+                              <span>
+                                <span className="font-bold">{user.followersCount}</span> abonnés
+                              </span>
+                              <span>
+                                <span className="font-bold">{user.followingCount}</span> abonnements
+                              </span>
+                              <span>
+                                <span className="font-bold">{user.postsCount ?? 0}</span> posts
+                              </span>
+                            </div>
+                          </div>
+                        </li>
+                      ))}
+                    </ul>
+                    {visibleUsers < userResults.length && (
+                      <div className="flex justify-center mt-4">
+                        <button
+                          className="px-4 py-2 rounded bg-blue-600 text-white dark:bg-blue-500 hover:bg-blue-700 dark:hover:bg-blue-600 transition"
+                          onClick={handleShowMore}
+                        >
+                          Afficher plus
+                        </button>
+                      </div>
+                    )}
+                  </>
                 )}
               </div>
               <div>
