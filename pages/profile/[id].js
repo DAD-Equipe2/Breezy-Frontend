@@ -75,9 +75,7 @@ export default function ProfilePage() {
           `${process.env.NEXT_PUBLIC_API_URL}/users/profile/avatar`,
           {
             method: "PUT",
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("breezyToken")}`,
-            },
+            credentials: "include",
             body: fd,
           }
         );
@@ -101,7 +99,6 @@ export default function ProfilePage() {
     try {
       await deleteProfile();
       logout();
-      localStorage.removeItem("breezyToken");
       router.replace("/");
     } catch (err) {
       alert(err.response?.data?.message || err.message);
@@ -159,10 +156,11 @@ export default function ProfilePage() {
           <div className="w-full flex items-center justify-center">
             <div className="w-1/2 h-px bg-gray-200 dark:bg-gray-700 rounded"></div>
           </div>
+
           {user.bio && (
             <div className="text-gray-800 dark:text-gray-200 max-w-lg text-sm leading-relaxed mt-2 w-full flex flex-col items-start px-0">
               <h2 className="font-semibold text-left w-full mb-1 px-4">Bio</h2>
-              <p className="text-justify whitespace-pre-line px-4">{user.bio}</p>
+              <p className="text-justify whitespace-pre-line break-all px-4">{user.bio}</p>
             </div>
           )}
           {isOwn ? (

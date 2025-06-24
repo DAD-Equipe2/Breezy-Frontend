@@ -10,17 +10,13 @@ export default function RightSidebar({ mobile = false }) {
     if (!user) return;
     (async () => {
       try {
-        const token = localStorage.getItem("breezyToken");
         const res = await fetch(
           `${process.env.NEXT_PUBLIC_API_URL}/follow/followers/${user._id}`,
           {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
+            credentials: "include"
           }
         );
         const json = await res.json();
-        console.log("DEBUG followers API response:", json); // <-- debug
         if (json.success && Array.isArray(json.data)) {
           setFollowers(json.data.slice(0, 10));
         } else {

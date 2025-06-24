@@ -7,111 +7,86 @@ export const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
   const router = useRouter();
   const [user, setUser] = useState(null);
-  const [token, setToken] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const storedToken = localStorage.getItem("breezyToken");
-    if (!storedToken){
+  axios
+    .get(`${process.env.NEXT_PUBLIC_API_URL}/users/me`, { withCredentials: true })
+    .then((res) => {
+      if (res.data.success) {
+        setUser(res.data.data);
+      }
       setLoading(false);
-      return;
-    }
-
-    axios.defaults.headers.common["Authorization"] = `Bearer ${storedToken}`;
-    setToken(storedToken);
-
-    axios
-      .get(`${process.env.NEXT_PUBLIC_API_URL}/users/me`)
-      .then((res) => {
-        if (res.data.success) {
-          setUser(res.data.data);
-        } else {
-          localStorage.removeItem("breezyToken");
-          setToken(null);
-        }
-        setLoading(false);
-      })
-      .catch(() => {
-        localStorage.removeItem("breezyToken");
-        setToken(null);
-        setLoading(false);
-      });
+    })
+    .catch(() => {
+      setUser(null);
+      setLoading(false);
+    });
   }, []);
 
-  const login = (tokenJWT) => {
-    localStorage.setItem("breezyToken", tokenJWT);
-    axios.defaults.headers.common["Authorization"] = `Bearer ${tokenJWT}`;
-    setToken(tokenJWT);
-
-    axios
-      .get(`${process.env.NEXT_PUBLIC_API_URL}/users/me`)
-      .then((res) => {
-        if (res.data.success) {
-          setUser(res.data.data);
-        }
-      })
-      .catch(() => {});
-  };
+  const login = async (credentials) => {
+    setLoading(true);
+    try{
+      await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/auth/login`, credentials, { withCredentials: true });
+      const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/users/me`, { withCredentials: true })
+      if (res.data.success) {
+        setUser(res.data.data);
+      } else {
+        setUser(null);
+      }
+    } catch (error) {
+      setUser(null);
+      console.error("Login failed:", error);
+    } finally {
+      setLoading(false);
+    }
+  }
 
   const logout = async () => {
+    if (!user) {
+      router.replace("/");
+      return;
+    }
+      
     try {
-      axios.post(`${process.env.NEXT_PUBLIC_API_URL}/auth/logout`,
-        {}, 
-        { withCredentials: true});
+      await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/auth/logout`, {}, { withCredentials: true });
     } catch (error) { }
-    localStorage.removeItem("breezyToken");
-    delete axios.defaults.headers.common["Authorization"];
     setUser(null);
-    setToken(null);
     router.replace("/")
   };
 
-  if (loading) {
-    return null
-  }
+  const refreshAccessToken = async () => {
+    try {
+      const res = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/auth/refresh-token`, {}, { withCredentials: true });
+      const data = res.data;
+      if (data.success) {
+        return;
+      } else {
+        if (user) logout();
+        return null;
+      }  
+    } catch (error) {
+      if (user) logout();
+      return null;
+    }
+  };
+
+  axios.interceptors.response.use(
+    (res) => res,
+    async (error) => {
+      const originalRequest = error.config;
+      if (error.response && error.response.status === 401 && !originalRequest._retry && !originalRequest.url.endsWith("/auth/refresh-token")) {
+        originalRequest._retry = true;
+        await refreshAccessToken();
+        return axios(originalRequest);
+      }
+      return Promise.reject(error);
+    }
+  );
 
   return (
-    <AuthContext.Provider value={{ user, token, login, logout }}>
+    <AuthContext.Provider value={{ user, login, logout, loading }}>
       {children}
     </AuthContext.Provider>
   );
 };
-
-const refreshAccessToken = async () => {
-  try {
-    const res = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/auth/refresh-token`, {}, { withCredentials: true });
-    const data = res.data;
-    if (data.success) {
-      localStorage.setItem("breezyToken", data.accessToken);
-      axios.defaults.headers.common["Authorization"] = `Bearer ${data.accessToken}`;
-      setToken(data.accessToken)
-      return data.accessToken;
-    } else {
-      logout();
-      return null;
-    }  
-  } catch (error) {
-    logout();
-    return null;
-  }
-};
-
-axios.interceptors.response.use(
-  res => res,
-  async (error) => {
-    const originalRequest = error.config;
-    if (
-      error.response &&
-      error.response.status === 401 &&
-      !originalRequest._retry
-    ) {
-      originalRequest._retry = true;
-      const newToken = await refreshAccessToken();
-      if (newToken) {
-        axios.defaults.headers.common["Authorization"] = `Bearer ${newToken}`;
-        return axios(originalRequest);
-      }
-    }
-    return Promise.reject(error);
-  }
-);

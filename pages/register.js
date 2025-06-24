@@ -1,17 +1,14 @@
 "use client";
 
-import { useState, useContext } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 
 import Navbar from "../src/components/Navbar";
-import { AuthContext } from "../src/context/AuthContext";
 import ImageUploadButton from "../src/components/ImageUploadButton";
 
 export default function Register() {
   const router = useRouter();
-  const { login } = useContext(AuthContext);
-  const { token } = useContext(AuthContext);
 
   const [formData, setFormData] = useState({
     username: "",
@@ -52,14 +49,11 @@ export default function Register() {
         data.append("avatarUrl", "/default-avatar.png");
       }
 
-      const headers = token ? { Authorization: `Bearer ${token}` } : {};
-
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/auth/register`,
         {
           method: "POST",
           body: data,
-          headers,
           credentials: "include"
         }
       );
@@ -67,7 +61,6 @@ export default function Register() {
       const json = await res.json();
       if (!json.success) throw new Error(json.message);
 
-      login(json.data.accessToken);
       router.push("/feed");
     } catch (err) {
       setError(err.message || "Erreur inscription");

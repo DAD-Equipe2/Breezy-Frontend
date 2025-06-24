@@ -4,8 +4,6 @@ import { deleteComment, getComments } from "../services/commentService"
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
-
-
 function CommentItem({ comment, onReply, replyToId, currentUser, onDelete }) {
   return (
     <div className="mb-4 border-l pl-4">

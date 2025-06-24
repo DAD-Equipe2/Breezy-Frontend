@@ -17,37 +17,24 @@ export default function Login() {
     password: "",
   });
   const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (user) {
-      router.replace("/feed");
-    }
+      window.location.href = "/feed";    }
   }, [user, router]);
-
-  if (loading || user) {
-    return (
-      <div className="flex items-center justify-center min-h-screen text-foreground">
-        Chargement...
-      </div>
-    );
-  }
 
   const handleChange = (e) =>
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
     setError(null);
     try {
-      const data = await loginUser(formData);
-      login(data.accessToken);
-      router.push("/feed");
+      await loginUser(formData);
+      window.location.href = "/feed";    
     } catch (err) {
       const apiMessage = err.response?.data?.message;
       setError(apiMessage || err.message || "Erreur de connexion");
-      setLoading(false);
     }
   };
 
@@ -96,10 +83,8 @@ export default function Login() {
 
             <button
               type="submit"
-              disabled={loading}
               className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 rounded-xl w-full font-semibold transition-transform transform hover:scale-105 disabled:opacity-60"
             >
-              {loading ? "Connexion..." : "Se connecter"}
             </button>
           </motion.form>
         </main>

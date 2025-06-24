@@ -71,8 +71,6 @@ export default function FeedPage() {
     }
   };
 
-  if (!currentUser) return null;
-
   return (
     <>
       <div className="fixed inset-0 z-0 animate-bg-pan bg-[linear-gradient(var(--grad-angle),var(--grad-from),var(--grad-to))] bg-[length:300%_300%]"></div>

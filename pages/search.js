@@ -55,7 +55,7 @@ export default function SearchPage() {
                           className="flex items-center gap-4 p-4 rounded-lg bg-white dark:bg-gray-800 shadow border border-gray-200 dark:border-gray-700"
                         >
                           <img
-                            src={user.avatarUrl || "/default-avatar.png"}
+                            src={user.avatarURL ? `${process.env.NEXT_PUBLIC_API_URL}${user.avatarURL}` : "/default-avatar.png"}
                             alt={user.username}
                             className="w-14 h-14 rounded-full object-cover border border-gray-300 dark:border-gray-600"
                           />

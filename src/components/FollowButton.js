@@ -12,9 +12,9 @@ const FollowButton = ({ targetUserId, onFollowChange }) => {
     const checkFollow = async () => {
       try {
         const res = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/follow/following/${currentUser.id}`,
+          `${process.env.NEXT_PUBLIC_API_URL}/follow/following/${currentUser._id}`,
           {
-            headers: { Authorization: `Bearer ${localStorage.getItem("breezyToken")}` },
+            credentials: "include"
           }
         );
         const data = await res.json();
