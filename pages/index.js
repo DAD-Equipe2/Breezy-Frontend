@@ -4,6 +4,8 @@ import { useContext } from 'react';
 import Link from 'next/link';
 import { AuthContext } from '../src/context/AuthContext';
 import { useRouter } from 'next/navigation';
+import ThemeToggle from "../src/components/ThemeToggle";
+
 
 export default function Home() {
   const { user, loading } = useContext(AuthContext);
@@ -43,6 +45,9 @@ export default function Home() {
           </div>
         </div>
       </main>
+      <div className="fixed bottom-6 right-6 z-50">
+        <ThemeToggle />
+      </div>
     </div>
   );
 }
