@@ -117,8 +117,8 @@ export default function ProfilePage() {
     <>
       <div className="fixed inset-0 z-0 animate-bg-pan bg-[linear-gradient(var(--grad-angle),var(--grad-from),var(--grad-to))] bg-[length:300%_300%]"></div>
       <Navbar />
-      <div className="relative max-w-2xl mx-auto mt-8 p-4 min-h-screen pt-20 z-10 text-foreground">
-        {/* Profil modernisé */}
+      <div className="relative max-w-2xl mx-auto mt-8 p-4 min-h-screen pt-28 md:pt-20 z-10 text-foreground">
+  
         <div className="relative bg-gradient-to-br from-neutral-50 via-blue-50 to-indigo-100 dark:from-neutral-900 dark:via-blue-950 dark:to-indigo-950 rounded-2xl shadow-xl p-6 flex flex-col items-center text-center space-y-4 mb-8 border border-blue-200/60 dark:border-blue-900/60">
           <img
             src={

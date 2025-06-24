@@ -2,7 +2,7 @@ import { useContext, useEffect, useState } from "react";
 import Link from "next/link";
 import { AuthContext } from "../context/AuthContext";
 
-export default function RightSidebar() {
+export default function RightSidebar({ mobile = false }) {
   const { user } = useContext(AuthContext);
   const [followers, setFollowers] = useState([]);
 
@@ -33,8 +33,14 @@ export default function RightSidebar() {
   }, [user]);
 
   return (
-    <aside className="hidden md:flex flex-col items-center fixed right-0 top-0 h-screen w-1/4 max-w-xs p-6 z-20">
-      <div className="bg-white/80 dark:bg-blue-950/80 rounded-2xl shadow-xl border border-blue-200/60 dark:border-blue-900/60 w-full p-6 mt-24">
+    <aside
+      className={
+        mobile
+          ? "flex flex-col items-center w-full p-0"
+          : "hidden md:flex flex-col items-center fixed right-0 top-0 h-screen w-1/4 max-w-xs p-6 z-20"
+      }
+    >
+      <div className="bg-white/80 dark:bg-blue-950/80 rounded-2xl shadow-xl border border-blue-200/60 dark:border-blue-900/60 w-full p-6 mt-0 md:mt-24">
         <h2 className="text-lg font-bold text-blue-700 dark:text-blue-300 mb-4">
           Followers
         </h2>

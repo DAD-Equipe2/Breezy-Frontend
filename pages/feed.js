@@ -8,8 +8,6 @@ import PostCard from "../src/components/PostCard";
 import { AuthContext } from "../src/context/AuthContext";
 import { getFeed, createPost } from "../src/services/postService";
 import ImageUploadButton from "../src/components/ImageUploadButton";
-import LeftSidebar from "../src/components/LeftSidebar";
-import RightSidebar from "../src/components/RightSidebar";
 
 export default function FeedPage() {
   const router = useRouter();
@@ -80,8 +78,7 @@ export default function FeedPage() {
       <div className="fixed inset-0 z-0 animate-bg-pan bg-[linear-gradient(var(--grad-angle),var(--grad-from),var(--grad-to))] bg-[length:300%_300%]"></div>
       <Navbar />
       <div className="relative flex justify-center md:justify-between max-w-full">
-        <LeftSidebar />
-        <main className="w-full md:w-1/2 max-w-2xl mx-auto mt-8 p-4 min-h-screen pt-20 z-10 text-foreground">
+        <main className="w-full md:w-1/2 max-w-2xl mx-auto mt-8 p-4 min-h-screen pt-28 md:pt-20 z-10 text-foreground">
           {/* Encadrement */}
           <div className="bg-white/80 dark:bg-blue-950/80 backdrop-blur-md rounded-2xl shadow-2xl border border-blue-200/60 dark:border-blue-900/60 p-6 mb-8 transition-all duration-200 hover:shadow-[0_8px_40px_rgba(59,130,246,0.15)]">
             <form onSubmit={handlePostSubmit} className="mb-0">
@@ -143,7 +140,6 @@ export default function FeedPage() {
             posts.map((post) => <PostCard key={post._id} post={post} />)
           )}
         </main>
-        <RightSidebar />
       </div>
     </>
   );
