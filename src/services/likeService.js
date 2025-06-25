@@ -2,7 +2,7 @@ import axios from "axios";
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export const likePost = async (postId) => {
-  const res = await axios.post(`${API_URL}/likes/post/${postId}`, { withCredentials: true });
+  const res = await axios.post(`${API_URL}/likes/post/${postId}`, {}, { withCredentials: true });
   return res.data;
 };
 

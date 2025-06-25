@@ -25,8 +25,8 @@ export const getFeed = async () => {
 
 export const modifyPost = async (postId, FormData) => {
   const res = await axios.patch(`${API_URL}/posts/${postId}`, FormData, {
-    headers: { "Content-Type": "multipart/form-data" }, withCredentials: true
-  },);
+    headers: { "Content-Type": "multipart/form-data" }, withCredentials: true },
+  );
   return res.data.data;
 };
 
