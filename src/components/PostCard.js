@@ -6,8 +6,8 @@ import { likePost, unlikePost, getPostLikes } from "../services/likeService";
 import { getComments, addComment, replyToComment } from "../services/commentService";
 import { modifyPost } from "../services/postService";
 import CommentSection from "./CommentSection";
-import EditButton from "./EditButton";
 import ImageUploadButton from "./ImageUploadButton";
+import PostMenuBurger from "./PostMenuBurger";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 const MAX_LEN = 280;
@@ -131,16 +131,10 @@ export default function PostCard({ post, isOwn, onDelete }) {
     <div className="bg-white/80 dark:bg-black/30 text-foreground shadow-2xl rounded-xl p-4 mb-6 border border-gray-300 dark:border-white/20 transition-transform duration-200 hover:shadow-[0_8px_30px_rgba(0,0,0,0.2)] relative">
       {isOwn && !isEditing && (
         <div className="absolute top-3 right-3 z-10">
-          <EditButton onClick={() => setIsEditing(true)} title="Modifier le post" />
-          <button
-            className="w-9 h-9 flex items-center justify-center rounded-full bg-red-400 hover:bg-red-500 text-white text-lg shadow transition group"
-            onClick={() => setShowDeleteModal(true)}
-            title="Supprimer le post"
-            aria-label="Supprimer le post"
-            type="button"
-          >
-            <span className="group-hover:scale-110 transition-transform">🗑️</span>
-          </button>
+          <PostMenuBurger
+            onEdit={() => setIsEditing(true)}
+            onDelete={() => setShowDeleteModal(true)}
+          />
         </div>
       )}
       <div className="flex items-center space-x-3 mb-2">

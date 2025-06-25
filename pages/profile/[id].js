@@ -5,7 +5,6 @@ import { useRouter } from "next/router";
 
 import Navbar from "../../src/components/Navbar";
 import PostCard from "../../src/components/PostCard";
-import EditButton from "../../src/components/EditButton";
 import FollowButton from "../../src/components/FollowButton";
 import ImageUploadButton from "../../src/components/ImageUploadButton";
 import ProfileMenuBurger from "../../src/components/ProfileMenuBurger";
