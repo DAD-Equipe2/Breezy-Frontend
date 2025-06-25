@@ -20,7 +20,8 @@ export default function Login() {
 
   useEffect(() => {
     if (user) {
-      window.location.href = "/feed";    }
+      window.location.href = "/feed";
+    }
   }, [user, router]);
 
   const handleChange = (e) =>
@@ -31,7 +32,7 @@ export default function Login() {
     setError(null);
     try {
       await loginUser(formData);
-      window.location.href = "/feed";    
+      window.location.href = "/feed";
     } catch (err) {
       const apiMessage = err.response?.data?.message;
       setError(apiMessage || err.message || "Erreur de connexion");
@@ -85,6 +86,7 @@ export default function Login() {
               type="submit"
               className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 rounded-xl w-full font-semibold transition-transform transform hover:scale-105 disabled:opacity-60"
             >
+              Connexion
             </button>
           </motion.form>
         </main>
