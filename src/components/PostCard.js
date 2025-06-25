@@ -7,6 +7,7 @@ import { getComments, addComment, replyToComment } from "../services/commentServ
 import { modifyPost } from "../services/postService";
 import CommentSection from "./CommentSection";
 import EditButton from "./EditButton";
+import ImageUploadButton from "./ImageUploadButton";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 const MAX_LEN = 280;
@@ -160,27 +161,45 @@ export default function PostCard({ post, isOwn, onDelete }) {
       </div>
 
       {isEditing ? (
-        <form onSubmit={handleEditSubmit} className="space-y-2 mb-3">
-          {errorEdit && <div className="text-red-500 text-sm">{errorEdit}</div>}
-          <textarea
-            className="w-full border px-2 py-1 rounded bg-white/80 dark:bg-white/10 text-foreground"
-            value={editContent}
-            onChange={(e) => setEditContent(e.target.value)}
-            rows={3}
-            maxLength={MAX_LEN}
-            placeholder="Modifier le contenu…"
-          />
-          <div className="text-right text-xs text-gray-500">{editContent.length}/{MAX_LEN}</div>
+        <form onSubmit={handleEditSubmit} className="space-y-3 mb-3 bg-white/90 dark:bg-blue-950/80 rounded-xl p-4 border border-blue-200/40 dark:border-blue-900/40 shadow-lg">
+          {errorEdit && <div className="text-red-500 text-sm mb-2">{errorEdit}</div>}
+          <label className="block font-medium text-gray-700 dark:text-gray-200 mb-1">Contenu du post :</label>
+          <div className="relative">
+            <textarea
+              className="w-full border border-blue-200 dark:border-blue-900 px-3 py-2 rounded-lg bg-white/80 dark:bg-blue-900 text-foreground focus:outline-none focus:ring-2 focus:ring-blue-400 dark:focus:ring-blue-700 resize-none"
+              value={editContent}
+              onChange={(e) => setEditContent(e.target.value)}
+              rows={4}
+              maxLength={MAX_LEN}
+              placeholder="Modifier le contenu…"
+            />
+            <span className="absolute bottom-2 right-3 text-xs text-gray-500 dark:text-gray-300">
+              {editContent.length}/{MAX_LEN}
+            </span>
+          </div>
+          <label className="block font-medium text-gray-700 dark:text-gray-200 mb-1">Tags :</label>
           <input
             type="text"
-            className="w-full border px-2 py-1 rounded bg-white/80 dark:bg-white/10 text-foreground"
-            placeholder="Tags"
+            className="w-full border border-blue-200 dark:border-blue-900 px-3 py-2 rounded-lg bg-white/80 dark:bg-blue-900 text-foreground focus:outline-none focus:ring-2 focus:ring-blue-400 dark:focus:ring-blue-700"
+            placeholder="Tags (séparés par des virgules)"
             value={editTags}
             onChange={(e) => setEditTags(e.target.value)}
           />
-          <input type="file" accept="image/*,video/*" onChange={(e) => setEditMediaFile(e.target.files[0])} />
+          <div className="flex flex-col sm:flex-row sm:items-center gap-3 mt-2">
+            <label className="block font-medium text-gray-700 dark:text-gray-200">Média :</label>
+            <div className="flex items-center gap-2">
+              <ImageUploadButton
+                onChange={file => setEditMediaFile(file)}
+                value={editMediaFile}
+                accept="image/*,video/*"
+              />
+              {editMediaFile && (
+                <span className="text-xs text-blue-700 dark:text-blue-300 font-semibold">{editMediaFile.name}</span>
+              )}
+            </div>
+          </div>
           {post.mediaURL && !removeMedia && (
-            <div className="mb-2">
+            <div className="mb-2 mt-2">
               {/\.(jpg|jpeg|png|gif)$/i.test(post.mediaURL) ? (
                 <img src={`${API_URL}${post.mediaURL}`} className="w-full max-h-48 object-contain rounded" />
               ) : (
@@ -197,11 +216,11 @@ export default function PostCard({ post, isOwn, onDelete }) {
               </label>
             </div>
           )}
-          <div className="flex space-x-2">
-            <button type="submit" className="px-3 py-1 bg-green-500 text-white rounded">Sauvegarder</button>
+          <div className="flex space-x-2 justify-end mt-4">
+            <button type="submit" className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded shadow">Sauvegarder</button>
             <button
               type="button"
-              className="px-3 py-1 bg-gray-300 dark:bg-gray-700 rounded"
+              className="px-4 py-2 bg-gray-300 dark:bg-gray-700 rounded shadow"
               onClick={() => {
                 setIsEditing(false);
                 setEditContent(post.content);

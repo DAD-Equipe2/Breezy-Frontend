@@ -8,6 +8,7 @@ import PostCard from "../../src/components/PostCard";
 import EditButton from "../../src/components/EditButton";
 import FollowButton from "../../src/components/FollowButton";
 import ImageUploadButton from "../../src/components/ImageUploadButton";
+import ProfileMenuBurger from "../../src/components/ProfileMenuBurger";
 import { AuthContext } from "../../src/context/AuthContext";
 import { getProfile, updateProfile, deleteProfile } from "../../src/services/userService";
 
@@ -172,16 +173,10 @@ export default function ProfilePage() {
           )}
           {isOwn ? (
             <div className="absolute top-3 right-3 z-10 flex gap-2">
-              <EditButton onClick={() => setIsEditing(true)} title="Modifier le profil" />
-              <button
-                className="w-10 h-10 flex items-center justify-center rounded-full bg-red-400 hover:bg-red-500 text-white text-xl shadow transition group"
-                onClick={() => setShowDeleteModal(true)}
-                title="Supprimer le profil"
-                aria-label="Supprimer le profil"
-                type="button"
-              >
-                <span className="group-hover:scale-110 transition-transform">🗑️</span>
-              </button>
+              <ProfileMenuBurger
+                onEdit={() => setIsEditing(true)}
+                onDelete={() => setShowDeleteModal(true)}
+              />
             </div>
           ) : (
             <div className="mt-4">
