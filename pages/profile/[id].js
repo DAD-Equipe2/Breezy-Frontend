@@ -105,6 +105,13 @@ export default function ProfilePage() {
     }
   };
 
+  const handleDeletePost = (postId) => {
+  setProfileData(prev => ({
+    ...prev,
+    posts: prev.posts.filter(p => p._id !== postId)
+  }));
+};
+
   if (loading) return <div className="text-foreground">Chargement…</div>;
   if (error) return <div className="text-red-600">{error}</div>;
 
@@ -256,7 +263,7 @@ export default function ProfilePage() {
         {posts.length === 0 ? (
           <p className="text-foreground">Aucun post pour le moment.</p>
         ) : (
-          posts.map((post) => <PostCard key={post._id} post={post} isOwn={isOwn} />)
+          posts.map((post) => <PostCard key={post._id} post={post} isOwn={isOwn} onDelete={handleDeletePost} />)
         )}
 
         {showDeleteModal && (

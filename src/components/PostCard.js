@@ -11,7 +11,7 @@ import EditButton from "./EditButton";
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 const MAX_LEN = 280;
 
-export default function PostCard({ post, isOwn }) {
+export default function PostCard({ post, isOwn, onDelete }) {
   const { user: currentUser } = useContext(AuthContext);
 
   const [likesCount, setLikesCount] = useState(0);
@@ -27,6 +27,7 @@ export default function PostCard({ post, isOwn }) {
   const [editMediaFile, setEditMediaFile] = useState(null);
   const [removeMedia, setRemoveMedia] = useState(false);
   const [errorEdit, setErrorEdit] = useState("");
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   useEffect(() => {
     if (!currentUser) return;
@@ -130,6 +131,15 @@ export default function PostCard({ post, isOwn }) {
       {isOwn && !isEditing && (
         <div className="absolute top-3 right-3 z-10">
           <EditButton onClick={() => setIsEditing(true)} title="Modifier le post" />
+          <button
+            className="w-9 h-9 flex items-center justify-center rounded-full bg-red-400 hover:bg-red-500 text-white text-lg shadow transition group"
+            onClick={() => setShowDeleteModal(true)}
+            title="Supprimer le post"
+            aria-label="Supprimer le post"
+            type="button"
+          >
+            <span className="group-hover:scale-110 transition-transform">🗑️</span>
+          </button>
         </div>
       )}
       <div className="flex items-center space-x-3 mb-2">
@@ -259,6 +269,43 @@ export default function PostCard({ post, isOwn }) {
           setComments={setComments}
         />
       )}
+
+    {showDeleteModal && (
+    <div className="fixed inset-0 bg-black bg-opacity-40 dark:bg-opacity-80 flex items-center justify-center z-50">
+      <div className="bg-white dark:bg-blue-950 text-foreground dark:text-white rounded shadow-lg p-6 max-w-sm w-full">
+        <h2 className="text-lg font-bold mb-2">Supprimer le post</h2>
+        <p className="mb-4">
+          Êtes-vous sûr de vouloir supprimer ce post ? Cette action est <span className="font-semibold text-red-600">irréversible</span>.
+        </p>
+        <div className="flex justify-end gap-2">
+          <button
+            className="px-4 py-2 bg-gray-300 dark:bg-gray-700 dark:text-white rounded"
+            onClick={() => setShowDeleteModal(false)}
+          >
+            Annuler
+          </button>
+          <button
+            type="button"
+            className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded"
+            onClick={async () => {
+              try {
+                await fetch(`${API_URL}/posts/${post._id}`, {
+                  method: "DELETE",
+                  credentials: "include",
+                });
+                setShowDeleteModal(false);
+                onDelete(post._id);
+              } catch {
+                alert("Erreur lors de la suppression du post.");
+              }
+            }}
+          >
+            Supprimer
+          </button>
+        </div>
+      </div>
     </div>
+    )}
+    </div>    
   );
 }
