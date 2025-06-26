@@ -4,26 +4,26 @@ import { AuthContext } from "../context/AuthContext";
 
 export default function RightSidebar({ mobile = false }) {
   const { user } = useContext(AuthContext);
-  const [followers, setFollowers] = useState([]);
+  const [following, setfollowing] = useState([]);
 
   useEffect(() => {
     if (!user) return;
     (async () => {
       try {
         const res = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/follow/followers/${user._id}`,
+          `${process.env.NEXT_PUBLIC_API_URL}/follow/following/${user._id}`,
           {
             credentials: "include"
           }
         );
         const json = await res.json();
         if (json.success && Array.isArray(json.data)) {
-          setFollowers(json.data.slice(0, 10));
+          setfollowing(json.data.slice(0, 10));
         } else {
-          setFollowers([]);
+          setfollowing([]);
         }
       } catch (e) {
-        setFollowers([]);
+        setfollowing([]);
       }
     })();
   }, [user]);
@@ -38,15 +38,15 @@ export default function RightSidebar({ mobile = false }) {
     >
       <div className="bg-white/80 dark:bg-blue-950/80 rounded-2xl shadow-xl border border-blue-200/60 dark:border-blue-900/60 w-full p-6 mt-0 md:mt-24">
         <h2 className="text-lg font-bold text-blue-700 dark:text-blue-300 mb-4">
-          Followers
+          Comptes suivis
         </h2>
-        {followers.length === 0 ? (
+        {following.length === 0 ? (
           <p className="text-gray-500 dark:text-gray-300 text-sm">
             Aucun abonné à afficher.
           </p>
         ) : (
           <ul className="space-y-3">
-            {followers.map((f) => (
+            {following.map((f) => (
               <li key={f._id} className="flex items-center gap-3">
                 <Link
                   href={`/profile/${f._id}`}

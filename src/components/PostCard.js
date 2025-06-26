@@ -110,10 +110,14 @@ export default function PostCard({ post, isOwn, onDelete }) {
       "tags",
       JSON.stringify(editTags.split(",").map((t) => t.trim()).filter((t) => t))
     );
-    if (editMediaFile) {
+
+    if (removeMedia) {
+      form.append("removeMedia", "true");
+    } else if (editMediaFile) {
       form.append("media", editMediaFile);
     }
-    form.append("removeMedia", removeMedia ? "true" : "false");
+
+    // form.append("removeMedia", removeMedia ? "true" : "false");
     try {
       const updated = await modifyPost(post._id, form);
       post.content = updated.content;
@@ -183,7 +187,7 @@ export default function PostCard({ post, isOwn, onDelete }) {
             <label className="block font-medium text-gray-700 dark:text-gray-200">Média :</label>
             <div className="flex items-center gap-2">
               <ImageUploadButton
-                onChange={file => setEditMediaFile(file)}
+                onChange={file => setEditMediaFile(file.target.files[0])}
                 value={editMediaFile}
                 accept="image/*,video/*"
               />
