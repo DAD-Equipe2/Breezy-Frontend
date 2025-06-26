@@ -21,7 +21,10 @@ export default function FeedPage() {
   const MAX_LEN = 280;
 
   useEffect(() => {
-    if (!currentUser) return;
+    if (!currentUser) {
+      router.replace("/");
+      return;
+    }
     (async () => {
       try {
         const postsArray = await getFeed();
@@ -32,7 +35,7 @@ export default function FeedPage() {
         setLoading(false);
       }
     })();
-  }, [currentUser]);
+  }, [currentUser, router]);
 
   const handlePostSubmit = async (e) => {
     e.preventDefault();

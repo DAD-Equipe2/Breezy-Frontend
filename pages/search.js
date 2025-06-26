@@ -34,8 +34,8 @@ export default function SearchPage() {
   return (
     <div className="relative min-h-screen overflow-hidden text-foreground">
       <div className="absolute inset-0 z-0 animate-bg-pan bg-[linear-gradient(var(--grad-angle),var(--grad-from),var(--grad-to))] bg-[length:300%_300%]"></div>
-      <div className="relative z-30">
-        <Navbar />
+      <Navbar />
+      <main className="relative z-10">
         <div className="max-w-2xl mx-auto mt-8 p-4 pt-20">
           <h2 className="text-2xl font-bold mb-4">Résultats pour « {query} »</h2>
           {loading ? (
@@ -105,7 +105,7 @@ export default function SearchPage() {
             </>
           )}
         </div>
-      </div>
+      </main>
     </div>
   );
 }

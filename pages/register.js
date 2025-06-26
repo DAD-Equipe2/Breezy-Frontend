@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
+import { AuthContext } from "../src/context/AuthContext";
 
 import Navbar from "../src/components/Navbar";
 import ImageUploadButton from "../src/components/ImageUploadButton";
@@ -32,6 +33,8 @@ export default function Register() {
     setAvatarFile(file);
   };
 
+  const { setUser } = useContext(AuthContext);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -60,6 +63,8 @@ export default function Register() {
 
       const json = await res.json();
       if (!json.success) throw new Error(json.message);
+
+      if (setUser && json.data) setUser(json.data);
 
       router.push("/feed");
     } catch (err) {
