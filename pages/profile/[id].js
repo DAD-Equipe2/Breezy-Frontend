@@ -238,9 +238,9 @@ export default function ProfilePage() {
                       value={editForm.bio}
                       onChange={handleEditChange}
                       className="w-full border px-2 py-1 rounded bg-white/80 dark:bg-blue-900 text-foreground dark:text-white"
-                      maxLength={100}
+                      maxLength={200}
                     />
-                    <small className="text-gray-600 dark:text-gray-300">{editForm.bio.length}/100</small>
+                    <small className="text-gray-600 dark:text-gray-300">{editForm.bio.length}/200</small>
                   </div>
                   <div>
                     <div className="flex flex-col items-center">
