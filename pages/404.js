@@ -15,7 +15,7 @@ export default function Custom404() {
           className="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
           onClick={() => router.push("/")}
         >
-          Retour à l'accueil
+          Retour à l&apos;accueil
         </button>
       </div>
     </>

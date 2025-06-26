@@ -14,7 +14,7 @@ import { getProfile, updateProfile, deleteProfile } from "../../src/services/use
 export default function ProfilePage() {
   const router = useRouter();
   const { id } = router.query;
-  const { user: currentUser, logout } = useContext(AuthContext);
+  const { user: currentUser, logout, setUser } = useContext(AuthContext);
 
   const [profileData, setProfileData] = useState({ user: null, posts: [] });
   const [loading, setLoading] = useState(true);
@@ -86,10 +86,23 @@ export default function ProfilePage() {
           return alert(json.message);
         }
       }
-      const updatedUser = await updateProfile({ username: editForm.username.trim(), bio: editForm.bio, avatarURL });
+
+      const updateData = {
+        username: editForm.username.trim(),
+        bio: editForm.bio,
+      }
+      if (selectedFile) {
+        updateData.avatarURL = avatarURL;
+      }
+
+      const updatedUser = await updateProfile(updateData);
       setProfileData(prev => ({ ...prev, user: updatedUser }));
       setIsEditing(false);
       setSelectedFile(null);
+
+      if (setUser) setUser(updatedUser);
+      await refreshProfile();
+
     } catch (err) {
       alert(err.response?.data?.message || err.message);
     }
@@ -233,7 +246,14 @@ export default function ProfilePage() {
                     <div className="flex flex-col items-center">
                       <ImageUploadButton
                         value={selectedFile}
-                        onChange={file => setSelectedFile(file)}
+                        onChange={file => {
+                          if (file && file.target && file.target.files) {
+                            setSelectedFile(file.target.files[0]);
+                          } else {
+                            setSelectedFile(file)
+                          }
+                          }
+                        }
                         accept="image/*"
                       />
                       <span className="text-xs font-semibold text-blue-700 dark:text-blue-300 mt-2">Nouvel avatar</span>
